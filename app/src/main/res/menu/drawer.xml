@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context=".NavigationViewActivity">
+    <group
+        android:id="@+id/menu_main"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/articlelist"
+            android:icon="@mipmap/ic_menu_articlelist"
+            android:title="@string/articleList"/>
+        <item
+            android:id="@+id/mylist"
+            android:icon="@mipmap/ic_menu_mylist"
+            android:title="@string/myList"/>
+        <item
+            android:id="@+id/history"
+            android:icon="@mipmap/ic_menu_history"
+            android:title="@string/history"/>
+    </group>
+</menu>
