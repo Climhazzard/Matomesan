@@ -19,6 +19,10 @@ public class DBAdapter {
         return db.query(DBHelper.TABLE_NAME, null, null, null, null, null, orderStr);
     }
 
+    public void deleteRecode(String key) {
+        db.delete(DBHelper.TABLE_NAME, "URL=?", new String[]{key});
+    }
+
     public void insert(listItem item) {
         ContentValues values = new ContentValues();
         values.put("Title", item.getTitle());

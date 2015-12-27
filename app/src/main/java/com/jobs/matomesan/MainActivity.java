@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.articleList);
+
         listView = (ListView)findViewById(android.R.id.list);
         mSwipe = (SwipeRefreshLayout)findViewById(R.id.swipelayout);
 

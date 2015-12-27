@@ -39,6 +39,10 @@ public class CustomAdapter extends BaseAdapter {
         return position;
     }
 
+    public void remove(listItem item) {
+        listItem.remove(item);
+    }
+
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         listItem item = (listItem)getItem(position);

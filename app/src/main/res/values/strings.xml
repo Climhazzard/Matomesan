@@ -3,6 +3,7 @@
     <string name="articleList">新着記事</string>
     <string name="myList">マイリスト</string>
     <string name="history">閲覧履歴</string>
+    <string name="delete">この記事を削除しますか？</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_web_view">WebViewActivity</string>
 

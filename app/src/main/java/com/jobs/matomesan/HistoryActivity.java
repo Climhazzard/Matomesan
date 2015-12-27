@@ -1,5 +1,6 @@
 package com.jobs.matomesan;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.design.widget.NavigationView;
@@ -7,9 +8,11 @@ import android.support.v4.widget.DrawerLayout;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +29,9 @@ public class HistoryActivity extends AppCompatActivity {
     List<listItem> list = new ArrayList<>();
     private ListView listView;
     private DrawerLayout drawerLayout;
+    CustomAdapter adapter;
+    listItem item;
+    private String tmpURL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +40,7 @@ public class HistoryActivity extends AppCompatActivity {
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.history);
+
         listView = (ListView)findViewById(android.R.id.list);
 
         drawerLayout = (DrawerLayout)findViewById(R.id.drawer);
@@ -88,14 +95,37 @@ public class HistoryActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView parent, View view, int position, long id) {
-                listItem item = (listItem) parent.getAdapter().getItem(position);
+                listItem item = (listItem)parent.getAdapter().getItem(position);
                 Intent intent = new Intent(HistoryActivity.this, WebViewActivity.class);
                 intent.putExtra("getLink", item.getLink());
                 startActivity(intent);
             }
         });
-    }
 
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView parent, View view, int position, long id) {
+                adapter = (CustomAdapter)parent.getAdapter();
+                item = (listItem)adapter.getItem(position);
+                tmpURL = item.getLink();
+                new AlertDialog.Builder(HistoryActivity.this)
+                        .setMessage(R.string.delete)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                adapter.remove(item);
+                                adapter.notifyDataSetChanged();
+                                DBAdapter DBAdapter = new DBAdapter(HistoryActivity.this);
+                                DBAdapter.deleteRecode(tmpURL);
+                            }
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+
+                return true;
+            }
+        });
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
