@@ -70,6 +70,8 @@ public class AsyncThread extends AsyncTask<String, String, String> {
             @Override
             public void onItemClick(AdapterView parent, View view, int position, long id) {
                 listItem item = (listItem) parent.getAdapter().getItem(position);
+                DBAdapter DBAdapter = new DBAdapter(context);
+                DBAdapter.insert(item);
                 Intent intent = new Intent(context, WebViewActivity.class);
                 intent.putExtra("getLink", item.getLink());
                 context.startActivity(intent);

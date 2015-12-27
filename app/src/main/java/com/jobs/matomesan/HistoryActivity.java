@@ -1,47 +1,40 @@
 package com.jobs.matomesan;
 
 import android.content.Intent;
-import android.support.design.widget.FloatingActionButton;
+import android.database.Cursor;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
+
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
-    ListView listView;
-    String XML_PARSER_URL = "http://testmode.s348.xrea.com/xmlparser.php";
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class HistoryActivity extends AppCompatActivity {
     private Toolbar toolbar;
+    List<listItem> list = new ArrayList<>();
+    private ListView listView;
     private DrawerLayout drawerLayout;
-    private SwipeRefreshLayout mSwipe;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
+        setContentView(R.layout.activity_history);
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(R.string.articleList);
+        getSupportActionBar().setTitle(R.string.history);
         listView = (ListView)findViewById(android.R.id.list);
-        mSwipe = (SwipeRefreshLayout)findViewById(R.id.swipelayout);
-
-        FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.first_fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AsyncThread task = new AsyncThread(listView, MainActivity.this);
-                task.execute(XML_PARSER_URL);
-                Toast.makeText(MainActivity.this, "now loading...", Toast.LENGTH_SHORT).show();
-            }
-        });
 
         drawerLayout = (DrawerLayout)findViewById(R.id.drawer);
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name){
@@ -65,15 +58,15 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.articlelist:
-                        drawerLayout.closeDrawers();
-                        break;
-                    case R.id.mylist:
-                        Toast.makeText(MainActivity.this, "mylist", Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.history:
-                        Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
+                        Intent intent = new Intent(HistoryActivity.this, MainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
+                        break;
+                    case R.id.mylist:
+                        Toast.makeText(HistoryActivity.this, "mylist", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.history:
+                        drawerLayout.closeDrawers();
                         break;
                     default:
                         break;
@@ -82,22 +75,32 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        AsyncThread task = new AsyncThread(listView, MainActivity.this);
-        task.execute(XML_PARSER_URL);
+        DBAdapter DBAdapter = new DBAdapter(this);
+        Cursor c = DBAdapter.getAllList();
+        while (c.moveToNext()) {
+            list.add(new listItem(c.getString(c.getColumnIndex("Site")),
+                    c.getString(c.getColumnIndex("Title")),
+                    c.getString(c.getColumnIndex("URL")),
+                    c.getString(c.getColumnIndex("Date"))));
+        }
+        listView.setAdapter(new CustomAdapter(HistoryActivity.this, list));
 
-        mSwipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onRefresh() {
-                AsyncThread task = new AsyncThread(listView, MainActivity.this, mSwipe);
-                task.execute(XML_PARSER_URL);
+            public void onItemClick(AdapterView parent, View view, int position, long id) {
+                listItem item = (listItem) parent.getAdapter().getItem(position);
+                Intent intent = new Intent(HistoryActivity.this, WebViewActivity.class);
+                intent.putExtra("getLink", item.getLink());
+                startActivity(intent);
             }
         });
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_history, menu);
         return true;
     }
 

@@ -22,6 +22,10 @@
             android:name=".WebViewActivity"
             android:label="@string/title_activity_web_view" >
         </activity>
+        <activity
+            android:name=".HistoryActivity"
+            android:label="@string/title_activity_history" >
+        </activity>
     </application>
 
 </manifest>
