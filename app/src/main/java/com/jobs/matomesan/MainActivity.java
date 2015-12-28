@@ -3,17 +3,25 @@ package com.jobs.matomesan;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.Filterable;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import java.util.logging.Filter;
 
 public class MainActivity extends AppCompatActivity {
     ListView listView;
@@ -21,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private SwipeRefreshLayout mSwipe;
+    private SearchView mSearchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.articleList);
-
+        //toolbar.inflateMenu(R.menu.search);
         listView = (ListView)findViewById(android.R.id.list);
         mSwipe = (SwipeRefreshLayout)findViewById(R.id.swipelayout);
 
@@ -97,8 +106,31 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.search, menu);
+        MenuItem searchItem = menu.findItem(R.id.menu_search);
+        mSearchView = (SearchView)MenuItemCompat.getActionView(searchItem);
+        mSearchView.setQueryHint(getString(R.string.search_hint));
+        listView.setTextFilterEnabled(true);
+        int options = mSearchView.getImeOptions();
+        mSearchView.setImeOptions(options| EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String str) {
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String str) {
+                android.widget.Filter filter = ((Filterable)listView.getAdapter()).getFilter();
+                if (TextUtils.isEmpty(str)) {
+                    //listView.clearTextFilter();
+                    filter.filter("");
+                } else {
+                    //listView.setFilterText(str);
+                    filter.filter(str);
+                }
+                return false;
+            }
+        });
         return true;
     }
 
