@@ -26,6 +26,10 @@
             android:name=".HistoryActivity"
             android:label="@string/title_activity_history" >
         </activity>
+        <activity
+            android:name=".MyListActivity"
+            android:label="@string/title_activity_my_list" >
+        </activity>
     </application>
 
 </manifest>

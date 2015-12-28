@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.design.widget.NavigationView;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 
 import android.os.Bundle;
@@ -66,12 +67,14 @@ public class HistoryActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.articlelist:
-                        Intent intent = new Intent(HistoryActivity.this, MainActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
+                        Intent articleIntent = new Intent(HistoryActivity.this, MainActivity.class);
+                        articleIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(articleIntent);
                         break;
                     case R.id.mylist:
-                        Toast.makeText(HistoryActivity.this, "mylist", Toast.LENGTH_SHORT).show();
+                        Intent mylistIntent = new Intent(HistoryActivity.this, MyListActivity.class);
+                        mylistIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(mylistIntent);
                         break;
                     case R.id.history:
                         drawerLayout.closeDrawers();
@@ -129,6 +132,13 @@ public class HistoryActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        toolbar.inflateMenu(R.menu.trash);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -136,7 +146,20 @@ public class HistoryActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.menu_trash) {
+            new AlertDialog.Builder(HistoryActivity.this)
+                    .setMessage(R.string.trash)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            listView.setAdapter(new CustomAdapter(HistoryActivity.this, new ArrayList<listItem>()));
+                            ((CustomAdapter)listView.getAdapter()).notifyDataSetChanged();
+                            DBAdapter DBAdapter = new DBAdapter(HistoryActivity.this);
+                            DBAdapter.deleteAllRecode();
+                        }
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
             return true;
         }
 

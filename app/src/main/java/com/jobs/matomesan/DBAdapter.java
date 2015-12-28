@@ -23,6 +23,10 @@ public class DBAdapter {
         db.delete(DBHelper.TABLE_NAME, "URL=?", new String[]{key});
     }
 
+    public void deleteAllRecode() {
+        db.delete(DBHelper.TABLE_NAME, null, null);
+    }
+
     public void insert(listItem item) {
         ContentValues values = new ContentValues();
         values.put("Title", item.getTitle());

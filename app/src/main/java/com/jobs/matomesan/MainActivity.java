@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.articleList);
-        //toolbar.inflateMenu(R.menu.search);
         listView = (ListView)findViewById(android.R.id.list);
         mSwipe = (SwipeRefreshLayout)findViewById(R.id.swipelayout);
 
@@ -78,12 +77,14 @@ public class MainActivity extends AppCompatActivity {
                         drawerLayout.closeDrawers();
                         break;
                     case R.id.mylist:
-                        Toast.makeText(MainActivity.this, "mylist", Toast.LENGTH_SHORT).show();
+                        Intent mylistIntent = new Intent(MainActivity.this, MyListActivity.class);
+                        mylistIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(mylistIntent);
                         break;
                     case R.id.history:
-                        Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
+                        Intent historyIntent = new Intent(MainActivity.this, HistoryActivity.class);
+                        historyIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(historyIntent);
                         break;
                     default:
                         break;
