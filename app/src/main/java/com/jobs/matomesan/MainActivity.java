@@ -21,8 +21,6 @@ import android.widget.Filterable;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.logging.Filter;
-
 public class MainActivity extends AppCompatActivity {
     ListView listView;
     String XML_PARSER_URL = "http://testmode.s348.xrea.com/xmlparser.php";

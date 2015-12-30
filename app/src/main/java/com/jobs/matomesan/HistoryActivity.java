@@ -4,23 +4,19 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.design.widget.NavigationView;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,11 +24,11 @@ import java.util.List;
 
 public class HistoryActivity extends AppCompatActivity {
     private Toolbar toolbar;
-    List<listItem> list = new ArrayList<>();
+    List<ListItem> list = new ArrayList<>();
     private ListView listView;
     private DrawerLayout drawerLayout;
     CustomAdapter adapter;
-    listItem item;
+    ListItem item;
     private String tmpURL;
 
     @Override
@@ -86,20 +82,20 @@ public class HistoryActivity extends AppCompatActivity {
             }
         });
 
-        DBAdapter DBAdapter = new DBAdapter(this);
+        HistoryDBAdapter DBAdapter = new HistoryDBAdapter(this);
         Cursor c = DBAdapter.getAllList();
         while (c.moveToNext()) {
-            list.add(new listItem(c.getString(c.getColumnIndex("Site")),
-                    c.getString(c.getColumnIndex("Title")),
-                    c.getString(c.getColumnIndex("URL")),
-                    c.getString(c.getColumnIndex("Date"))));
+            list.add(new ListItem(c.getString(c.getColumnIndex("site")),
+                    c.getString(c.getColumnIndex("title")),
+                    c.getString(c.getColumnIndex("url")),
+                    c.getString(c.getColumnIndex("date"))));
         }
         listView.setAdapter(new CustomAdapter(HistoryActivity.this, list));
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView parent, View view, int position, long id) {
-                listItem item = (listItem)parent.getAdapter().getItem(position);
+                ListItem item = (ListItem)parent.getAdapter().getItem(position);
                 Intent intent = new Intent(HistoryActivity.this, WebViewActivity.class);
                 intent.putExtra("getLink", item.getLink());
                 startActivity(intent);
@@ -110,7 +106,7 @@ public class HistoryActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView parent, View view, int position, long id) {
                 adapter = (CustomAdapter)parent.getAdapter();
-                item = (listItem)adapter.getItem(position);
+                item = (ListItem)adapter.getItem(position);
                 tmpURL = item.getLink();
                 new AlertDialog.Builder(HistoryActivity.this)
                         .setMessage(R.string.delete)
@@ -119,7 +115,7 @@ public class HistoryActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 adapter.remove(item);
                                 adapter.notifyDataSetChanged();
-                                DBAdapter DBAdapter = new DBAdapter(HistoryActivity.this);
+                                HistoryDBAdapter DBAdapter = new HistoryDBAdapter(HistoryActivity.this);
                                 DBAdapter.deleteRecode(tmpURL);
                             }
                         })
@@ -152,9 +148,9 @@ public class HistoryActivity extends AppCompatActivity {
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            listView.setAdapter(new CustomAdapter(HistoryActivity.this, new ArrayList<listItem>()));
+                            listView.setAdapter(new CustomAdapter(HistoryActivity.this, new ArrayList<ListItem>()));
                             ((CustomAdapter)listView.getAdapter()).notifyDataSetChanged();
-                            DBAdapter DBAdapter = new DBAdapter(HistoryActivity.this);
+                            HistoryDBAdapter DBAdapter = new HistoryDBAdapter(HistoryActivity.this);
                             DBAdapter.deleteAllRecode();
                         }
                     })

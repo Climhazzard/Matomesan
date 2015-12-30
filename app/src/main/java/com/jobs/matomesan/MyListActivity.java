@@ -1,20 +1,31 @@
 package com.jobs.matomesan;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 
 public class MyListActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
+    private ListView MyListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +76,37 @@ public class MyListActivity extends AppCompatActivity {
                 return false;
             }
         });
-    }
+        SharedPreferences data = getSharedPreferences("DataSave", MODE_PRIVATE);
+        SharedPreferences.Editor editor = data.edit();
+        List items = new ArrayList<String>();
+        if (data.getInt("init_mylist", 0) == 0) {
+            MyListDBAdapter DBAdapter = new MyListDBAdapter(MyListActivity.this);
+            DBAdapter.makeDefaultMyList();
+            editor.putInt("init_mylist", 1);
+            editor.commit();
+        }
 
+        MyListDBAdapter DBAdapter = new MyListDBAdapter(MyListActivity.this);
+        Cursor c = DBAdapter.getMyList();
+        while (c.moveToNext()) {
+            int id = c.getInt(c.getColumnIndex("id"));
+            String name = c.getString(c.getColumnIndex("name"));
+            items.add(new MyListInfo(id, name));
+        }
+        MyListView = (ListView)findViewById(android.R.id.list);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.row_mylist, R.id.row_textView, items);
+        MyListView.setAdapter(adapter);
+
+        MyListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView parent, View view, int position, long id) {
+                MyListInfo items = (MyListInfo)parent.getAdapter().getItem(position);
+                Intent intent = new Intent(MyListActivity.this, MyListContentsActivity.class);
+                intent.putExtra("items", items);
+                startActivity(intent);
+            }
+        });
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

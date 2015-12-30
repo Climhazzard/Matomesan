@@ -17,16 +17,16 @@ import java.util.List;
 
 public class CustomAdapter extends BaseAdapter implements Filterable {
     private Context context;
-    private List<listItem> listItem;
-    private List<listItem> mBackData = new ArrayList<listItem>();
+    private List<ListItem> listItem;
+    private List<ListItem> mBackData = new ArrayList<ListItem>();
     private LayoutInflater layoutInflater = null;
     private customFilter mFilter;
 
-    public CustomAdapter(Context context, List<listItem> list) {
+    public CustomAdapter(Context context, List<ListItem> list) {
         super();
         this.context = context;
         this.listItem = list;
-        this.listItem = new ArrayList<listItem>(list);
+        this.listItem = new ArrayList<ListItem>(list);
         this.mBackData = list;
         layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -46,13 +46,13 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
         return position;
     }
 
-    public void remove(listItem item) {
+    public void remove(ListItem item) {
         listItem.remove(item);
     }
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        listItem item = (listItem)getItem(position);
+        ListItem item = (ListItem)getItem(position);
         convertView = layoutInflater.inflate(R.layout.list_item, null);
         TextView tv = (TextView)convertView.findViewById(R.id.list_item);
         TextView tv2 = (TextView)convertView.findViewById(R.id.list_title);
@@ -80,14 +80,14 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
     class customFilter extends Filter {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
-            List<listItem> filtered = new ArrayList<>();
+            List<ListItem> filtered = new ArrayList<>();
             String filterString = constraint.toString().trim().toLowerCase();
             if (TextUtils.isEmpty(filterString)) {
                 filtered = mBackData;
             } else {
-                for(listItem i : mBackData) {
+                for(ListItem i : mBackData) {
                     if (i.getTitle().contains(filterString)) {
-                        filtered.add(new listItem(i.getSiteName(), i.getTitle(), i.getLink(), i.getDate()));
+                        filtered.add(new ListItem(i.getSiteName(), i.getTitle(), i.getLink(), i.getDate()));
                     }
                 }
             }
@@ -98,7 +98,7 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
         }
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            listItem = (List<listItem>)results.values;
+            listItem = (List<ListItem>)results.values;
             if (results != null && results.count > 0) {
                 notifyDataSetChanged();
             } else {

@@ -7,7 +7,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DBHelper extends SQLiteOpenHelper {
     public static final String DB_NAME = "datastore.db";
     public static final int DB_VERSION = 1;
-    public static final String TABLE_NAME = "History";
+    public static final String TABLE_HISTORY = "History";
+    public static final String TABLE_MYLIST = "MyList";
+    public static final String TABLE_MYLISTCONTENTS = "MyListContents";
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -16,19 +18,34 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(
-                "CREATE TABLE " + TABLE_NAME + "(" +
-                        "Id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        "Title TEXT NOT NULL, " +
-                        "URL TEXT NOT NULL, " +
-                        "Site TEXT NOT NULL, " +
-                        "Date TEXT NOT NULL)"
+                "CREATE TABLE History (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "title TEXT NOT NULL, " +
+                        "url TEXT NOT NULL, " +
+                        "site TEXT NOT NULL, " +
+                        "date TEXT NOT NULL)"
 
+        );
+        db.execSQL(
+                "CREATE TABLE MyList (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "name TEXT NOT NULL, " +
+                        "created_at TEXT NOT NULL)"
+        );
+        db.execSQL(
+                "CREATE TABLE MyListContents (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "mylist_id INTEGER NOT NULL, " +
+                        "site TEXT NOT NULL, " +
+                        "url TEXT NOT NULL)"
         );
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + HistoryDBAdapter.DATABASE_TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + MyListDBAdapter.DATABASE_TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + MyListContentsDBAdapter.DATABASE_TABLE);
         onCreate(db);
     }
 }
