@@ -1,14 +1,19 @@
 package com.jobs.matomesan;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -19,6 +24,10 @@ import java.util.List;
 public class MyListContentsActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private ListView MyListContentsView;
+    private EditText editInput;
+    ArrayAdapter<String> adapter;
+    MyListInfo getItems;
+    MyListInfo items;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,20 +35,52 @@ public class MyListContentsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_my_list_contents);
 
         Intent intent = getIntent();
-        MyListInfo items = (MyListInfo)intent.getSerializableExtra("items");
+        getItems = (MyListInfo)intent.getSerializableExtra("items");
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(items.toString());
+        getSupportActionBar().setTitle(getItems.toString());
 
-        List siteName = new ArrayList<String>();
+        List listItems = new ArrayList<String>();
         MyListContentsDBAdapter DBAdapter = new MyListContentsDBAdapter(MyListContentsActivity.this);
-        Cursor c = DBAdapter.getMyContentsList(items.getId());
+        Cursor c = DBAdapter.getMyContentsList(getItems.getId());
         while (c.moveToNext()) {
-            siteName.add(c.getString(c.getColumnIndex("site")));
+            int id = c.getInt(c.getColumnIndex("id"));
+            String name = c.getString(c.getColumnIndex("site"));
+            listItems.add(new MyListInfo(id, name));
         }
         MyListContentsView = (ListView)findViewById(android.R.id.list);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, siteName);
+        adapter = new ArrayAdapter<String>(this, R.layout.row_mylistcontents, R.id.row_textView, listItems);
         MyListContentsView.setAdapter(adapter);
+
+        MyListContentsView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView parent, View view, int position, long id) {
+                items = (MyListInfo)parent.getAdapter().getItem(position);
+                new AlertDialog.Builder(MyListContentsActivity.this)
+                        .setMessage(R.string.delete)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                MyListContentsDBAdapter DBAdapter = new MyListContentsDBAdapter(MyListContentsActivity.this);
+                                DBAdapter.deleteRecode(items.getId());
+                                Cursor c = DBAdapter.getMyContentsList(getItems.getId());
+                                List listItems = new ArrayList<String>();
+                                while (c.moveToNext()) {
+                                    int id = c.getInt(c.getColumnIndex("id"));
+                                    String name = c.getString(c.getColumnIndex("site"));
+                                    listItems.add(new MyListInfo(id, name));
+                                }
+                                ArrayAdapter<String> adapter = new ArrayAdapter<String>(MyListContentsActivity.this, R.layout.row_mylistcontents, R.id.row_textView, listItems);
+                                MyListContentsView.setAdapter(adapter);
+                                adapter.notifyDataSetChanged();
+                            }
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+
+                return true;
+            }
+        });
     }
 
 
@@ -58,7 +99,30 @@ public class MyListContentsActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_add_url) {
+            editInput = new EditText(this);
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.add_input_url)
+                    .setView(editInput)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            MyListContentsDBAdapter DBAdapter = new MyListContentsDBAdapter(MyListContentsActivity.this);
+                            DBAdapter.addURL(getItems.getId(), editInput.getText().toString());
+                            Cursor c = DBAdapter.getMyContentsList(getItems.getId());
+                            List listItems = new ArrayList<String>();
+                            while (c.moveToNext()) {
+                                int id = c.getInt(c.getColumnIndex("id"));
+                                String name = c.getString(c.getColumnIndex("site"));
+                                listItems.add(new MyListInfo(id, name));
+                            }
+                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(MyListContentsActivity.this, R.layout.row_mylistcontents, R.id.row_textView, listItems);
+                            MyListContentsView.setAdapter(adapter);
+                            adapter.notifyDataSetChanged();
+                        }
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
             return true;
         }
 

@@ -1,5 +1,6 @@
 package com.jobs.matomesan;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -7,25 +8,27 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
 
 public class MyListActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private ListView MyListView;
+    private EditText editInput;
+    private ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +84,7 @@ public class MyListActivity extends AppCompatActivity {
         List items = new ArrayList<String>();
         if (data.getInt("init_mylist", 0) == 0) {
             MyListDBAdapter DBAdapter = new MyListDBAdapter(MyListActivity.this);
-            DBAdapter.makeDefaultMyList();
+            DBAdapter.addDefaultMyList();
             editor.putInt("init_mylist", 1);
             editor.commit();
         }
@@ -94,7 +97,7 @@ public class MyListActivity extends AppCompatActivity {
             items.add(new MyListInfo(id, name));
         }
         MyListView = (ListView)findViewById(android.R.id.list);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.row_mylist, R.id.row_textView, items);
+        adapter = new ArrayAdapter<String>(this, R.layout.row_mylist, R.id.row_textView, items);
         MyListView.setAdapter(adapter);
 
         MyListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -123,7 +126,30 @@ public class MyListActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_add_mylist) {
+            editInput = new EditText(this);
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.add_mylist_dialog)
+                    .setView(editInput)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            MyListDBAdapter DBAdapter = new MyListDBAdapter(MyListActivity.this);
+                            DBAdapter.addNewMyList(editInput.getText().toString());
+                            List items = new ArrayList<String>();
+                            Cursor c = DBAdapter.getMyList();
+                            while (c.moveToNext()) {
+                                int id = c.getInt(c.getColumnIndex("id"));
+                                String name = c.getString(c.getColumnIndex("name"));
+                                items.add(new MyListInfo(id, name));
+                            }
+                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(MyListActivity.this, R.layout.row_mylist, R.id.row_textView, items);
+                            MyListView.setAdapter(adapter);
+                            adapter.notifyDataSetChanged();
+                        }
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
             return true;
         }
 

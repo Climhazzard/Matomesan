@@ -85,10 +85,10 @@ public class HistoryActivity extends AppCompatActivity {
         HistoryDBAdapter DBAdapter = new HistoryDBAdapter(this);
         Cursor c = DBAdapter.getAllList();
         while (c.moveToNext()) {
-            list.add(new ListItem(c.getString(c.getColumnIndex("site")),
-                    c.getString(c.getColumnIndex("title")),
-                    c.getString(c.getColumnIndex("url")),
-                    c.getString(c.getColumnIndex("date"))));
+            list.add(new ListItem(c.getString(c.getColumnIndex("Site")),
+                    c.getString(c.getColumnIndex("Title")),
+                    c.getString(c.getColumnIndex("URL")),
+                    c.getString(c.getColumnIndex("Date"))));
         }
         listView.setAdapter(new CustomAdapter(HistoryActivity.this, list));
 

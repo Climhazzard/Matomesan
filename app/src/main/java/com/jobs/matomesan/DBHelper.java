@@ -37,7 +37,8 @@ public class DBHelper extends SQLiteOpenHelper {
                         "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         "mylist_id INTEGER NOT NULL, " +
                         "site TEXT NOT NULL, " +
-                        "url TEXT NOT NULL)"
+                        "url TEXT NOT NULL, " +
+                        "flag INTEGER NOT NULL)"
         );
     }
 

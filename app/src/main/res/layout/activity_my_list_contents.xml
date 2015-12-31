@@ -20,6 +20,9 @@
         <ListView
             android:id="@id/android:list"
             android:drawSelectorOnTop="true"
+            android:divider="@null"
+            android:dividerHeight="7dp"
+            android:padding="7dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
