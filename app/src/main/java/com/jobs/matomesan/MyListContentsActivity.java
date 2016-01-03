@@ -3,11 +3,11 @@ package com.jobs.matomesan;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,7 +15,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +56,7 @@ public class MyListContentsActivity extends AppCompatActivity {
             public boolean onItemLongClick(AdapterView parent, View view, int position, long id) {
                 items = (MyListInfo)parent.getAdapter().getItem(position);
                 new AlertDialog.Builder(MyListContentsActivity.this)
-                        .setMessage(R.string.delete)
+                        .setMessage(R.string.delete_url)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -101,6 +100,7 @@ public class MyListContentsActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_add_url) {
             editInput = new EditText(this);
+            editInput.setInputType(InputType.TYPE_CLASS_TEXT);
             new AlertDialog.Builder(this)
                     .setTitle(R.string.add_input_url)
                     .setView(editInput)
@@ -108,17 +108,25 @@ public class MyListContentsActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             MyListContentsDBAdapter DBAdapter = new MyListContentsDBAdapter(MyListContentsActivity.this);
-                            DBAdapter.addURL(getItems.getId(), editInput.getText().toString());
-                            Cursor c = DBAdapter.getMyContentsList(getItems.getId());
-                            List listItems = new ArrayList<String>();
-                            while (c.moveToNext()) {
-                                int id = c.getInt(c.getColumnIndex("id"));
-                                String name = c.getString(c.getColumnIndex("site"));
-                                listItems.add(new MyListInfo(id, name));
+                            boolean successFlag = DBAdapter.addURL(getItems.getId(), editInput.getText().toString());
+                            if (successFlag) {
+                                Cursor c = DBAdapter.getMyContentsList(getItems.getId());
+                                List listItems = new ArrayList<String>();
+                                while (c.moveToNext()) {
+                                    int id = c.getInt(c.getColumnIndex("id"));
+                                    String name = c.getString(c.getColumnIndex("site"));
+                                    listItems.add(new MyListInfo(id, name));
+                                }
+                                ArrayAdapter<String> adapter = new ArrayAdapter<String>(MyListContentsActivity.this, R.layout.row_mylistcontents, R.id.row_textView, listItems);
+                                MyListContentsView.setAdapter(adapter);
+                                adapter.notifyDataSetChanged();
+                            } else {
+                                new AlertDialog.Builder(MyListContentsActivity.this)
+                                        .setTitle("Error")
+                                        .setMessage(R.string.error_url)
+                                        .setPositiveButton("OK", null)
+                                        .show();
                             }
-                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(MyListContentsActivity.this, R.layout.row_mylistcontents, R.id.row_textView, listItems);
-                            MyListContentsView.setAdapter(adapter);
-                            adapter.notifyDataSetChanged();
                         }
                     })
                     .setNegativeButton("Cancel", null)

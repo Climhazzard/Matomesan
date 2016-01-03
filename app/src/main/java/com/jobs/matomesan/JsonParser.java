@@ -39,4 +39,20 @@ public class JsonParser {
         }
         return list;
     }
+
+    public String[] addUrl(String JsonData) {
+        String[] item = new String[2];
+        try {
+            JSONObject rootObject = new JSONObject(JsonData);
+            JSONArray jsonArray = rootObject.getJSONArray("feed");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject js = jsonArray.getJSONObject(i);
+                item[0] = js.getString("site");
+                item[1] = js.getString("link");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return item;
+    }
 }

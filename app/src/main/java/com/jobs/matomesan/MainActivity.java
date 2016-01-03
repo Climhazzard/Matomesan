@@ -23,7 +23,7 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     ListView listView;
-    String XML_PARSER_URL = "http://testmode.s348.xrea.com/xmlparser.php";
+    public static final String XML_PARSER_URL = "http://testmode.s348.xrea.com/xmlparser.php";
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private SwipeRefreshLayout mSwipe;

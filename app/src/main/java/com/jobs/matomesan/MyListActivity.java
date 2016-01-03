@@ -12,11 +12,11 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -28,7 +28,7 @@ public class MyListActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ListView MyListView;
     private EditText editInput;
-    private ArrayAdapter<String> adapter;
+    private MyListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,22 +82,17 @@ public class MyListActivity extends AppCompatActivity {
         SharedPreferences data = getSharedPreferences("DataSave", MODE_PRIVATE);
         SharedPreferences.Editor editor = data.edit();
         List items = new ArrayList<String>();
-        if (data.getInt("init_mylist", 0) == 0) {
-            MyListDBAdapter DBAdapter = new MyListDBAdapter(MyListActivity.this);
-            DBAdapter.addDefaultMyList();
-            editor.putInt("init_mylist", 1);
-            editor.commit();
-        }
 
         MyListDBAdapter DBAdapter = new MyListDBAdapter(MyListActivity.this);
         Cursor c = DBAdapter.getMyList();
         while (c.moveToNext()) {
             int id = c.getInt(c.getColumnIndex("id"));
             String name = c.getString(c.getColumnIndex("name"));
-            items.add(new MyListInfo(id, name));
+            int flag = c.getInt(c.getColumnIndex("flag"));
+            items.add(new MyListInfo(id, name, flag));
         }
         MyListView = (ListView)findViewById(android.R.id.list);
-        adapter = new ArrayAdapter<String>(this, R.layout.row_mylist, R.id.row_textView, items);
+        adapter = new MyListAdapter(this,items);
         MyListView.setAdapter(adapter);
 
         MyListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -128,6 +123,7 @@ public class MyListActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_add_mylist) {
             editInput = new EditText(this);
+            editInput.setInputType(InputType.TYPE_CLASS_TEXT);
             new AlertDialog.Builder(this)
                     .setTitle(R.string.add_mylist_dialog)
                     .setView(editInput)
@@ -141,9 +137,10 @@ public class MyListActivity extends AppCompatActivity {
                             while (c.moveToNext()) {
                                 int id = c.getInt(c.getColumnIndex("id"));
                                 String name = c.getString(c.getColumnIndex("name"));
-                                items.add(new MyListInfo(id, name));
+                                int flag = c.getInt(c.getColumnIndex("flag"));
+                                items.add(new MyListInfo(id, name, flag));
                             }
-                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(MyListActivity.this, R.layout.row_mylist, R.id.row_textView, items);
+                            adapter = new MyListAdapter(MyListActivity.this, items);
                             MyListView.setAdapter(adapter);
                             adapter.notifyDataSetChanged();
                         }

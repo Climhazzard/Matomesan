@@ -27,16 +27,14 @@ public class MyListDBAdapter {
     public void addDefaultMyList() {
         ContentValues values = new ContentValues();
         values.put("name", context.getString(R.string.default_mylist_name));
-        values.put("created_at", "a");
+        values.put("flag", 1);
         db.insertOrThrow(DBHelper.TABLE_MYLIST, null, values);
     }
 
     public void addNewMyList(String name) {
-        //long recodeCount = DatabaseUtils.queryNumEntries(db, DBHelper.TABLE_MYLIST, "name=?", new String[]{name});
-        //Log.d("long", recodeCount + "a");
         ContentValues values = new ContentValues();
         values.put("name", name);
-        values.put("created_at", "a");
+        values.put("flag", 0);
         db.insertOrThrow(DBHelper.TABLE_MYLIST, null, values);
     }
 
@@ -45,6 +43,32 @@ public class MyListDBAdapter {
     }
 
     public Cursor getMyList() {
-        return db.query(DBHelper.TABLE_MYLIST, new String[]{"id", "name"}, null, null, null, null, null);
+        return db.query(DBHelper.TABLE_MYLIST, new String[]{"id", "name", "flag"}, null, null, null, null, null);
+    }
+
+    public void setFlag(int id, int flag) {
+        ContentValues values = new ContentValues();
+        values.put("flag", flag);
+        db.update(DBHelper.TABLE_MYLIST, values, "id=?", new String[] {Integer.toString(id)});
+    }
+
+    public boolean flagCheck(int id) {
+        long recodeCount = DatabaseUtils.queryNumEntries(db, DBHelper.TABLE_MYLIST, "id=? AND flag=1", new String[]{Integer.toString(id)});
+        return (recodeCount == 1) ? true : false;
+    }
+
+    public void flagClear() {
+        ContentValues values = new ContentValues();
+        values.put("flag", 0);
+        db.update(DBHelper.TABLE_MYLIST, values, null, null);
+    }
+
+    public int flagSearch() {
+        int id = 0;
+        Cursor c = db.query(DBHelper.TABLE_MYLIST, null, "flag=?", new String[] {"1"}, null, null, null);
+        while (c.moveToNext()) {
+            id = c.getInt(c.getColumnIndex("id"));
+        }
+        return id - 1;
     }
 }

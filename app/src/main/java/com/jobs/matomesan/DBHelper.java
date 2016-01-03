@@ -30,7 +30,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "CREATE TABLE MyList (" +
                         "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         "name TEXT NOT NULL, " +
-                        "created_at TEXT NOT NULL)"
+                        "flag INTEGER NOT NULL)"
         );
         db.execSQL(
                 "CREATE TABLE MyListContents (" +

@@ -4,6 +4,7 @@
     <string name="myList">マイリスト</string>
     <string name="history">閲覧履歴</string>
     <string name="delete">この記事を削除しますか？</string>
+    <string name="delete_url">このサイトを削除しますか？</string>
     <string name="trash">全件削除しますか？</string>
     <string name="search_hint">記事を検索</string>
     <string name="menu_search">Search</string>
@@ -13,6 +14,7 @@
     <string name="add_input_url">URLを入力して下さい</string>
     <string name="default_mylist_name">サイト一覧 (default)</string>
     <string name="add_url">URLから追加</string>
+    <string name="error_url">URLが不正です</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_web_view">WebViewActivity</string>
 

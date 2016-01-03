@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -21,6 +22,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,9 @@ public class AsyncThread extends AsyncTask<String, String, String> {
     private Context context;
     private SwipeRefreshLayout mSwipe;
     private StringBuilder reqURL;
+
+    public AsyncThread() {
+    }
 
     public AsyncThread(ListView listView, Context context) {
         this.listView = listView;
@@ -51,6 +56,8 @@ public class AsyncThread extends AsyncTask<String, String, String> {
         SharedPreferences data = context.getSharedPreferences("DataSave", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = data.edit();
         if (data.getInt("init", 0) == 0) {
+            MyListDBAdapter DBAdapter = new MyListDBAdapter(context);
+            DBAdapter.addDefaultMyList();
             initGetMyList(v[0]);
             editor.putInt("init", 1);
             editor.commit();
@@ -113,5 +120,46 @@ public class AsyncThread extends AsyncTask<String, String, String> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    class Param {
+        int id;
+        String url;
+
+        Param(int id, String url) {
+            this.id = id;
+            this.url = url;
+        }
+    }
+
+    public void feedUrlCheck(int id, String url) {
+        Param param = new Param(id, url);
+        new AsyncTask<Param, Void, String>() {
+            @Override
+            protected String doInBackground(Param... params) {
+                Param param = params[0];
+                String json = null;
+                try {
+                    HttpClient httpClient = new DefaultHttpClient();
+                    HttpPost post = new HttpPost(MainActivity.XML_PARSER_URL);
+                    ArrayList value = new ArrayList<NameValuePair>();
+                    value.add(new BasicNameValuePair("feed", param.url));
+                    post.setEntity(new UrlEncodedFormEntity(value, "UTF-8"));
+                    HttpResponse res = httpClient.execute(post);
+                    HttpEntity entity = res.getEntity();
+                    json = EntityUtils.toString(entity, "UTF-8");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return json;
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+                JsonParser jp = new JsonParser();
+                String[] item = jp.addUrl(result);
+            }
+
+        }.execute(param);
     }
 }
