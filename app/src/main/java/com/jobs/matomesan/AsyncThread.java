@@ -32,6 +32,15 @@ public class AsyncThread extends AsyncTask<String, String, String> {
     private Context context;
     private SwipeRefreshLayout mSwipe;
     private StringBuilder reqURL;
+    private CallBack callback;
+
+    public interface CallBack {
+        public void onProgressUpdate(String[] item);
+    }
+
+    public void setCallBack(CallBack cb) {
+        this.callback = cb;
+    }
 
     public AsyncThread() {
     }
@@ -69,29 +78,36 @@ public class AsyncThread extends AsyncTask<String, String, String> {
         while (c.moveToNext()) {
             reqURL.append(c.getString(c.getColumnIndex("url"))).append(",");
         }
-        HttpClient httpClient = new DefaultHttpClient();
-        HttpPost post = new HttpPost(v[0]);
-        ArrayList value = new ArrayList<NameValuePair>();
-        value.add(new BasicNameValuePair("str", reqURL.substring(0, reqURL.length() - 1).toString()));
-        String json = null;
-        try {
-            post.setEntity(new UrlEncodedFormEntity(value, "UTF-8"));
-            HttpResponse res = httpClient.execute(post);
-            HttpEntity entity = res.getEntity();
-            json = EntityUtils.toString(entity, "UTF-8");
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (!reqURL.toString().equals("")) {
+            HttpClient httpClient = new DefaultHttpClient();
+            HttpPost post = new HttpPost(v[0]);
+            ArrayList value = new ArrayList<NameValuePair>();
+            value.add(new BasicNameValuePair("str", reqURL.substring(0, reqURL.length() - 1).toString()));
+            String json = null;
+            try {
+                post.setEntity(new UrlEncodedFormEntity(value, "UTF-8"));
+                HttpResponse res = httpClient.execute(post);
+                HttpEntity entity = res.getEntity();
+                json = EntityUtils.toString(entity, "UTF-8");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            httpClient.getConnectionManager().shutdown();
+            return json;
+        } else {
+            return null;
         }
-        httpClient.getConnectionManager().shutdown();
-        return json;
     }
 
     @Override
     protected void onPostExecute(String result) {
+        if (mSwipe.isRefreshing()) {
+            mSwipe.setRefreshing(false);
+        }
+        if (result == null) return;
         JsonParser jp = new JsonParser();
         List<ListItem> list = jp.parse(result);
         listView.setAdapter(new CustomAdapter(context, list));
-        if (mSwipe != null) mSwipe.setRefreshing(false);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView parent, View view, int position, long id) {
@@ -158,6 +174,7 @@ public class AsyncThread extends AsyncTask<String, String, String> {
             protected void onPostExecute(String result) {
                 JsonParser jp = new JsonParser();
                 String[] item = jp.addUrl(result);
+                callback.onProgressUpdate(item);
             }
 
         }.execute(param);

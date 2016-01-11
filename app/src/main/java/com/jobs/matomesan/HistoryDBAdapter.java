@@ -16,7 +16,7 @@ public class HistoryDBAdapter {
     }
 
     public Cursor getAllList() {
-        String orderStr = "id desc";
+        String orderStr = "_id desc";
         return db.query(DBHelper.TABLE_HISTORY, null, null, null, null, null, orderStr);
     }
 

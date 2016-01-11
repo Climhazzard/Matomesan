@@ -43,13 +43,13 @@ public class MyListDBAdapter {
     }
 
     public Cursor getMyList() {
-        return db.query(DBHelper.TABLE_MYLIST, new String[]{"id", "name", "flag"}, null, null, null, null, null);
+        return db.query(DBHelper.TABLE_MYLIST, new String[]{"_id", "name", "flag"}, null, null, null, null, null);
     }
 
     public void setFlag(int id, int flag) {
         ContentValues values = new ContentValues();
         values.put("flag", flag);
-        db.update(DBHelper.TABLE_MYLIST, values, "id=?", new String[] {Integer.toString(id)});
+        db.update(DBHelper.TABLE_MYLIST, values, "_id=?", new String[] {Integer.toString(id)});
     }
 
     public boolean flagCheck(int id) {
@@ -67,8 +67,12 @@ public class MyListDBAdapter {
         int id = 0;
         Cursor c = db.query(DBHelper.TABLE_MYLIST, null, "flag=?", new String[] {"1"}, null, null, null);
         while (c.moveToNext()) {
-            id = c.getInt(c.getColumnIndex("id"));
+            id = c.getInt(c.getColumnIndex("_id"));
         }
         return id - 1;
+    }
+
+    public void deleteRecode(int id) {
+        db.delete(DBHelper.TABLE_MYLISTCONTENTS, "_id=?", new String[]{Integer.toString(id)});
     }
 }

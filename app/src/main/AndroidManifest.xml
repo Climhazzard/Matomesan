@@ -3,6 +3,7 @@
     package="com.jobs.matomesan" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <user-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL" />
 
     <application
         android:allowBackup="true"
@@ -34,6 +35,11 @@
             android:name=".MyListContentsActivity"
             android:label="@string/title_activity_my_list_contents" >
         </activity>
+        <provider
+            android:name=".MyListContentProvider"
+            android:authorities="com.jobs.matomesan.mycontentprovider"
+            android:exported="false" >
+        </provider>
     </application>
 
 </manifest>

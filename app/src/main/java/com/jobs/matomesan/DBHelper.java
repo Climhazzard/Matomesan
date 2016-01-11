@@ -19,7 +19,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(
                 "CREATE TABLE History (" +
-                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         "title TEXT NOT NULL, " +
                         "url TEXT NOT NULL, " +
                         "site TEXT NOT NULL, " +
@@ -28,13 +28,13 @@ public class DBHelper extends SQLiteOpenHelper {
         );
         db.execSQL(
                 "CREATE TABLE MyList (" +
-                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         "name TEXT NOT NULL, " +
                         "flag INTEGER NOT NULL)"
         );
         db.execSQL(
                 "CREATE TABLE MyListContents (" +
-                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         "mylist_id INTEGER NOT NULL, " +
                         "site TEXT NOT NULL, " +
                         "url TEXT NOT NULL, " +

@@ -1,32 +1,41 @@
 package com.jobs.matomesan;
 
+import android.app.LoaderManager;
+import android.content.ContentValues;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.ContentObserver;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+
 import android.view.Menu;
 import android.view.MenuItem;
+
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
-public class MyListContentsActivity extends AppCompatActivity {
+public class MyListContentsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private Toolbar toolbar;
-    private ListView MyListContentsView;
     private EditText editInput;
-    ArrayAdapter<String> adapter;
     MyListInfo getItems;
-    MyListInfo items;
+    Cursor cursor;
+    private static final String[] from = {"_id", "mylist_id", "site", "flag"};
+    private static final int[] to = {R.id.text, R.id.check};
+    private MyListContentsAdapter adapter;
+    private String url_pattern = "https?://[\\w/:%#\\$&\\?\\(\\)~\\.=\\+\\-]+";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,39 +48,46 @@ public class MyListContentsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getItems.toString());
 
-        List listItems = new ArrayList<String>();
-        MyListContentsDBAdapter DBAdapter = new MyListContentsDBAdapter(MyListContentsActivity.this);
-        Cursor c = DBAdapter.getMyContentsList(getItems.getId());
-        while (c.moveToNext()) {
-            int id = c.getInt(c.getColumnIndex("id"));
-            String name = c.getString(c.getColumnIndex("site"));
-            listItems.add(new MyListInfo(id, name));
-        }
-        MyListContentsView = (ListView)findViewById(android.R.id.list);
-        adapter = new ArrayAdapter<String>(this, R.layout.row_mylistcontents, R.id.row_textView, listItems);
-        MyListContentsView.setAdapter(adapter);
+        DBHelper helper = new DBHelper(this);
+        SQLiteDatabase db = helper.getWritableDatabase();
+        Cursor c = db.rawQuery("select * from MyListContents", null);
+        adapter = new MyListContentsAdapter(MyListContentsActivity.this, R.layout.row_mylistcontents, c, from, to, 0);
 
-        MyListContentsView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        ListView mListView = (ListView) findViewById(android.R.id.list);
+        mListView.setAdapter(adapter);
+        getLoaderManager().initLoader(0, null, this);
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView parent, View view, int position, long id) {
+                Cursor c = (Cursor) adapter.getItem(position);
+                CheckBox ck = (CheckBox) view.findViewById(R.id.check);
+                ContentValues values = new ContentValues();
+                if (c.getInt(c.getColumnIndex("flag")) == 1) {
+                    ck.setChecked(false);
+                    int tmp_id = c.getInt(c.getColumnIndex("_id"));
+                    values.put("flag", 0);
+                    getContentResolver().update(MyListContentProvider.CONTENT_URI, values, "_id=?", new String[]{Integer.toString(tmp_id)});
+                } else {
+                    ck.setChecked(true);
+                    int tmp_id = c.getInt(c.getColumnIndex("_id"));
+                    values.put("flag", 1);
+                    getContentResolver().update(MyListContentProvider.CONTENT_URI, values, "_id=?", new String[]{Integer.toString(tmp_id)});
+                }
+            }
+        });
+
+        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView parent, View view, int position, long id) {
-                items = (MyListInfo)parent.getAdapter().getItem(position);
+                cursor = (Cursor) adapter.getItem(position);
                 new AlertDialog.Builder(MyListContentsActivity.this)
                         .setMessage(R.string.delete_url)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                MyListContentsDBAdapter DBAdapter = new MyListContentsDBAdapter(MyListContentsActivity.this);
-                                DBAdapter.deleteRecode(items.getId());
-                                Cursor c = DBAdapter.getMyContentsList(getItems.getId());
-                                List listItems = new ArrayList<String>();
-                                while (c.moveToNext()) {
-                                    int id = c.getInt(c.getColumnIndex("id"));
-                                    String name = c.getString(c.getColumnIndex("site"));
-                                    listItems.add(new MyListInfo(id, name));
-                                }
-                                ArrayAdapter<String> adapter = new ArrayAdapter<String>(MyListContentsActivity.this, R.layout.row_mylistcontents, R.id.row_textView, listItems);
-                                MyListContentsView.setAdapter(adapter);
-                                adapter.notifyDataSetChanged();
+                                int tmp_id = cursor.getInt(cursor.getColumnIndex("_id"));
+                                getContentResolver().delete(MyListContentProvider.CONTENT_URI, "_id=?", new String[]{Integer.toString(tmp_id)});
                             }
                         })
                         .setNegativeButton("Cancel", null)
@@ -80,8 +96,32 @@ public class MyListContentsActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+        ContentObserver contentObserver = new ContentObserver(new Handler()) {
+            @Override
+            public void onChange(boolean selfChange) {
+                super.onChange(selfChange);
+                getLoaderManager().restartLoader(0, null, MyListContentsActivity.this);
+            }
+        };
+        getContentResolver().registerContentObserver(MyListContentProvider.CONTENT_URI, true, contentObserver);
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(this, MyListContentProvider.CONTENT_URI, from, "mylist_id=?", new String[]{Integer.toString(getItems.getId())}, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor>loader, Cursor cursor) {
+        adapter.swapCursor(cursor);
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.swapCursor(null);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -107,19 +147,29 @@ public class MyListContentsActivity extends AppCompatActivity {
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            MyListContentsDBAdapter DBAdapter = new MyListContentsDBAdapter(MyListContentsActivity.this);
-                            boolean successFlag = DBAdapter.addURL(getItems.getId(), editInput.getText().toString());
-                            if (successFlag) {
-                                Cursor c = DBAdapter.getMyContentsList(getItems.getId());
-                                List listItems = new ArrayList<String>();
-                                while (c.moveToNext()) {
-                                    int id = c.getInt(c.getColumnIndex("id"));
-                                    String name = c.getString(c.getColumnIndex("site"));
-                                    listItems.add(new MyListInfo(id, name));
-                                }
-                                ArrayAdapter<String> adapter = new ArrayAdapter<String>(MyListContentsActivity.this, R.layout.row_mylistcontents, R.id.row_textView, listItems);
-                                MyListContentsView.setAdapter(adapter);
-                                adapter.notifyDataSetChanged();
+                            if (editInput.getText().toString().matches(url_pattern)) {
+                                AsyncThread at = new AsyncThread();
+                                at.feedUrlCheck(getItems.getId(), editInput.getText().toString());
+                                at.setCallBack(new AsyncThread.CallBack() {
+                                    @Override
+                                    public void onProgressUpdate(String[] item) {
+                                        if (item[0].equals("error")) {
+                                            new AlertDialog.Builder(MyListContentsActivity.this)
+                                                    .setTitle("Error")
+                                                    .setMessage(R.string.error_url)
+                                                    .setPositiveButton("OK", null)
+                                                    .show();
+                                        } else {
+                                            ContentValues values = new ContentValues();
+                                            values.put("mylist_id", getItems.getId());
+                                            values.put("site", item[0]);
+                                            values.put("url", item[1]);
+                                            values.put("flag", 1);
+                                            getContentResolver().insert(MyListContentProvider.CONTENT_URI, values);
+                                            Toast.makeText(MyListContentsActivity.this, R.string.finish_add_url, Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
                             } else {
                                 new AlertDialog.Builder(MyListContentsActivity.this)
                                         .setTitle("Error")

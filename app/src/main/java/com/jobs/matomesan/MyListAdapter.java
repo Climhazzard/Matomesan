@@ -29,11 +29,11 @@ public class MyListAdapter extends ArrayAdapter<MyListInfo> {
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.row_mylist, parent, false);
             holder = new Holder();
-            holder.setTitleText((TextView)convertView.findViewById(R.id.title));
-            holder.setCheckBox((CheckBox)convertView.findViewById(R.id.checkBox));
+            holder.setTitleText((TextView) convertView.findViewById(R.id.title));
+            holder.setCheckBox((CheckBox) convertView.findViewById(R.id.checkBox));
             convertView.setTag(holder);
         } else {
-            holder = (Holder)convertView.getTag();
+            holder = (Holder) convertView.getTag();
         }
 
         MyListDBAdapter DBAdapter = new MyListDBAdapter(context);
@@ -50,7 +50,7 @@ public class MyListAdapter extends ArrayAdapter<MyListInfo> {
             holder.checkBox.setChecked(false);
         }
 
-        CheckBox checkBox = (CheckBox)convertView.findViewById(R.id.checkBox);
+        CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkBox);
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

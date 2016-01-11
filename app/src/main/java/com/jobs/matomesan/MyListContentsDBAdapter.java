@@ -7,13 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 
 import java.util.List;
 
-import javax.security.auth.callback.Callback;
-
-public class MyListContentsDBAdapter implements Callback {
+public class MyListContentsDBAdapter {
     private SQLiteDatabase db;
     private DBHelper helper;
     public static final String DATABASE_TABLE = "MyListContents";
-    private String url_pattern = "https?://[\\w/:%#\\$&\\?\\(\\)~\\.=\\+\\-]+";
 
     public MyListContentsDBAdapter(Context context) {
         helper = new DBHelper(context);
@@ -22,21 +19,11 @@ public class MyListContentsDBAdapter implements Callback {
 
     public Cursor getURLList() {
         //return db.query(DBHelper.TABLE_MYLISTCONTENTS, new String[]{"url"}, null, null, null, null, null);
-        return db.rawQuery("select MyListContents.url from MyList inner join MyListContents on MyList.id = MyListContents.mylist_id where MyList.flag = 1 and MyListContents.flag = 1", null);
+        return db.rawQuery("select MyListContents.url from MyList inner join MyListContents on MyList._id = MyListContents.mylist_id where MyList.flag = 1 and MyListContents.flag = 1", null);
     }
 
     public Cursor getMyContentsList(int getId) {
         return db.query(DBHelper.TABLE_MYLISTCONTENTS, null, "mylist_id=?", new String[] {Integer.toString(getId)}, null, null, null);
-    }
-
-    public boolean addURL(int id, String url) {
-        if (url.matches(url_pattern)) {
-            AsyncThread at = new AsyncThread();
-            at.feedUrlCheck(id, url);
-        } else {
-            return false;
-        }
-        return true;
     }
 
     public void insert(List<ListItem> item) {
@@ -51,6 +38,12 @@ public class MyListContentsDBAdapter implements Callback {
     }
 
     public void deleteRecode(int id) {
-        db.delete(DBHelper.TABLE_MYLISTCONTENTS, "id=?", new String[]{Integer.toString(id)});
+        db.delete(DBHelper.TABLE_MYLISTCONTENTS, "_id=?", new String[]{Integer.toString(id)});
+    }
+
+    public void setFlag(int id, int flag) {
+        ContentValues values = new ContentValues();
+        values.put("flag", flag);
+        db.update(DBHelper.TABLE_MYLISTCONTENTS, values, "_id=?", new String[] {Integer.toString(id)});
     }
 }

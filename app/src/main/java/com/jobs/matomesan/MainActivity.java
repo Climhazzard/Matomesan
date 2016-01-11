@@ -34,23 +34,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.articleList);
-        listView = (ListView)findViewById(android.R.id.list);
-        mSwipe = (SwipeRefreshLayout)findViewById(R.id.swipelayout);
+        listView = (ListView) findViewById(android.R.id.list);
+        mSwipe = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
 
-        FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.first_fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.first_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AsyncThread task = new AsyncThread(listView, MainActivity.this);
+                AsyncThread task = new AsyncThread(listView, MainActivity.this, mSwipe);
                 task.execute(XML_PARSER_URL);
                 Toast.makeText(MainActivity.this, "now loading...", Toast.LENGTH_SHORT).show();
             }
         });
 
-        drawerLayout = (DrawerLayout)findViewById(R.id.drawer);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name){
             @Override
             public void onDrawerClosed(View drawerView) {
@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        AsyncThread task = new AsyncThread(listView, MainActivity.this);
+        AsyncThread task = new AsyncThread(listView, MainActivity.this, mSwipe);
         task.execute(XML_PARSER_URL);
 
         mSwipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

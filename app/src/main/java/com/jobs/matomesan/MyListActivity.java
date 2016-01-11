@@ -29,6 +29,7 @@ public class MyListActivity extends AppCompatActivity {
     private ListView MyListView;
     private EditText editInput;
     private MyListAdapter adapter;
+    MyListInfo item;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +87,7 @@ public class MyListActivity extends AppCompatActivity {
         MyListDBAdapter DBAdapter = new MyListDBAdapter(MyListActivity.this);
         Cursor c = DBAdapter.getMyList();
         while (c.moveToNext()) {
-            int id = c.getInt(c.getColumnIndex("id"));
+            int id = c.getInt(c.getColumnIndex("_id"));
             String name = c.getString(c.getColumnIndex("name"));
             int flag = c.getInt(c.getColumnIndex("flag"));
             items.add(new MyListInfo(id, name, flag));
@@ -102,6 +103,25 @@ public class MyListActivity extends AppCompatActivity {
                 Intent intent = new Intent(MyListActivity.this, MyListContentsActivity.class);
                 intent.putExtra("items", items);
                 startActivity(intent);
+            }
+        });
+
+        MyListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView parent, View view, int position, long id) {
+                item = (MyListInfo)parent.getAdapter().getItem(position);
+                new AlertDialog.Builder(MyListActivity.this)
+                        .setMessage(R.string.delete_url)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                MyListDBAdapter DBAdapter = new MyListDBAdapter(MyListActivity.this);
+                                DBAdapter.deleteRecode(item.getId());
+                            }
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+                return true;
             }
         });
     }
@@ -135,7 +155,7 @@ public class MyListActivity extends AppCompatActivity {
                             List items = new ArrayList<String>();
                             Cursor c = DBAdapter.getMyList();
                             while (c.moveToNext()) {
-                                int id = c.getInt(c.getColumnIndex("id"));
+                                int id = c.getInt(c.getColumnIndex("_id"));
                                 String name = c.getString(c.getColumnIndex("name"));
                                 int flag = c.getInt(c.getColumnIndex("flag"));
                                 items.add(new MyListInfo(id, name, flag));
