@@ -11,6 +11,10 @@
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
         android:paddingTop="10dp"
+        android:ellipsize="end"
+        android:minHeight="40dp"
+        android:maxLines="2"
+        android:scrollHorizontally="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
