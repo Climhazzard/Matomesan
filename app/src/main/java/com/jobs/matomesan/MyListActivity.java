@@ -36,11 +36,11 @@ public class MyListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_list);
 
-        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.myList);
 
-        drawerLayout = (DrawerLayout)findViewById(R.id.drawer);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name){
             @Override
             public void onDrawerClosed(View drawerView) {
@@ -56,7 +56,7 @@ public class MyListActivity extends AppCompatActivity {
         actionBarDrawerToggle.syncState();
 
 
-        NavigationView mNavigationView = (NavigationView)findViewById(R.id.navigation_view);
+        NavigationView mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -92,7 +92,7 @@ public class MyListActivity extends AppCompatActivity {
             int flag = c.getInt(c.getColumnIndex("flag"));
             items.add(new MyListInfo(id, name, flag));
         }
-        MyListView = (ListView)findViewById(android.R.id.list);
+        MyListView = (ListView) findViewById(android.R.id.list);
         adapter = new MyListAdapter(this,items);
         MyListView.setAdapter(adapter);
 

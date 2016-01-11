@@ -35,13 +35,13 @@ public class HistoryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
-        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.history);
 
-        listView = (ListView)findViewById(android.R.id.list);
+        listView = (ListView) findViewById(android.R.id.list);
 
-        drawerLayout = (DrawerLayout)findViewById(R.id.drawer);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name){
             @Override
             public void onDrawerClosed(View drawerView) {
@@ -57,7 +57,7 @@ public class HistoryActivity extends AppCompatActivity {
         actionBarDrawerToggle.syncState();
 
 
-        NavigationView mNavigationView = (NavigationView)findViewById(R.id.navigation_view);
+        NavigationView mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {

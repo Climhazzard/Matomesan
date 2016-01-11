@@ -53,7 +53,7 @@ public class MyListDBAdapter {
     }
 
     public boolean flagCheck(int id) {
-        long recodeCount = DatabaseUtils.queryNumEntries(db, DBHelper.TABLE_MYLIST, "id=? AND flag=1", new String[]{Integer.toString(id)});
+        long recodeCount = DatabaseUtils.queryNumEntries(db, DBHelper.TABLE_MYLIST, "_id=? AND flag=1", new String[]{Integer.toString(id)});
         return (recodeCount == 1) ? true : false;
     }
 

@@ -39,14 +39,15 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(R.string.articleList);
         listView = (ListView) findViewById(android.R.id.list);
         mSwipe = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
+        mSwipe.setColorSchemeResources(R.color.base_color, R.color.blue, R.color.red, R.color.yellow);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.first_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mSwipe.setRefreshing(true);
                 AsyncThread task = new AsyncThread(listView, MainActivity.this, mSwipe);
                 task.execute(XML_PARSER_URL);
-                Toast.makeText(MainActivity.this, "now loading...", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         actionBarDrawerToggle.syncState();
 
 
-        NavigationView mNavigationView = (NavigationView)findViewById(R.id.navigation_view);
+        NavigationView mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -88,6 +89,13 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
                 return false;
+            }
+        });
+
+        mSwipe.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipe.setRefreshing(true);
             }
         });
 

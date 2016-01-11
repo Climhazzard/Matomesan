@@ -44,7 +44,7 @@ public class MyListContentsActivity extends AppCompatActivity implements LoaderM
 
         Intent intent = getIntent();
         getItems = (MyListInfo)intent.getSerializableExtra("items");
-        toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getItems.toString());
 
