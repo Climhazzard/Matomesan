@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Filterable;
 import android.widget.ListView;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     ListView listView;
@@ -39,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(R.string.articleList);
         listView = (ListView) findViewById(android.R.id.list);
         mSwipe = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
-        mSwipe.setColorSchemeResources(R.color.base_color, R.color.blue, R.color.red, R.color.yellow);
+        mSwipe.setColorSchemeResources(R.color.base_color, R.color.blue, R.color.red, R.color.green);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.first_fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -127,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
             }
             @Override
             public boolean onQueryTextChange(String str) {
-                android.widget.Filter filter = ((Filterable)listView.getAdapter()).getFilter();
+                android.widget.Filter filter = ((Filterable) listView.getAdapter()).getFilter();
                 if (TextUtils.isEmpty(str)) {
                     //listView.clearTextFilter();
                     filter.filter("");

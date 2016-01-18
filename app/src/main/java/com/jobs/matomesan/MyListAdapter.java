@@ -1,98 +1,74 @@
 package com.jobs.matomesan;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import java.util.List;
 
-public class MyListAdapter extends ArrayAdapter<MyListInfo> {
+public class MyListAdapter extends SimpleCursorAdapter {
     LayoutInflater layoutInflater = null;
-    private int selectedPosition;
-    private Context context;
+    private ViewHolder holder;
+    private MyListDBAdapter DBAdapter;
 
-    public MyListAdapter(Context context, List<MyListInfo> objects) {
-        super(context, R.layout.row_mylist, objects);
-        layoutInflater = LayoutInflater.from(context);
-        this.context = context;
+    public MyListAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
+        super(context, layout, c, from, to, flags);
+        layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        DBAdapter = new MyListDBAdapter(context);
+    }
+
+    static class ViewHolder {
+        TextView name;
+        RadioButton radio;
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public void bindView(View view, final Context context, final Cursor cursor) {
+        holder = (ViewHolder) view.getTag();
+        final String name = cursor.getString(cursor.getColumnIndex("name"));
+        final int flag = cursor.getInt(cursor.getColumnIndex("flag"));
+        holder.name.setText(name);
+        boolean rb;
+        rb = (flag == 1) ? true : false;
+        holder.radio.setChecked(rb);
+        holder.radio.setTag(cursor.getPosition());
 
-        final Holder holder;
-
-        if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.row_mylist, parent, false);
-            holder = new Holder();
-            holder.setTitleText((TextView) convertView.findViewById(R.id.title));
-            holder.setCheckBox((CheckBox) convertView.findViewById(R.id.checkBox));
-            convertView.setTag(holder);
-        } else {
-            holder = (Holder) convertView.getTag();
-        }
-
-        MyListDBAdapter DBAdapter = new MyListDBAdapter(context);
-        this.selectedPosition = DBAdapter.flagSearch();
-
-        final MyListInfo row = getItem(position);
-        holder.getTitleText().setText(row.toString());
-        holder.getCheckBox().setTag(position);
-        holder.getCheckBox().setChecked(row.isChecked());
-
-        if (position == selectedPosition) {
-            holder.checkBox.setChecked(true);
-        } else {
-            holder.checkBox.setChecked(false);
-        }
-
-        CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.checkBox);
-        checkBox.setOnClickListener(new View.OnClickListener() {
+        holder.radio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MyListDBAdapter DBAdapter = new MyListDBAdapter(context);
-                if (((CheckBox)view).isChecked()) {
-                    selectedPosition = position;
-                    DBAdapter.flagClear();
-                    DBAdapter.setFlag(getItem(position).getId(), 1);
-                } else {
-                    selectedPosition = -1;
-                    int id = getItem(position).getId();
-                    if (DBAdapter.flagCheck(id)) {
-                        holder.checkBox.setChecked(true);
-                        return;
-                    }
-                    DBAdapter.setFlag(getItem(position).getId(), 0);
+                if (((RadioButton) view).isChecked()) {
+                    int id = (Integer) view.getTag() + 1;
+                    MyListDBAdapter DBAdapter = new MyListDBAdapter(context);
+                    int getId = DBAdapter.getId(id);
+                    ContentValues resetValues = new ContentValues();
+                    resetValues.put("flag", 0);
+                    context.getContentResolver().update(TestProvider.CONTENT_URI, resetValues, "flag=1", null);
+                    ContentValues setValues = new ContentValues();
+                    setValues.put("flag", 1);
+                    context.getContentResolver().update(TestProvider.CONTENT_URI, setValues, "_id=?", new String[]{Integer.toString(getId)});
                 }
-                notifyDataSetChanged();
             }
         });
-
-        return convertView;
     }
 
-    static class Holder {
-        TextView titleText;
-        CheckBox checkBox;
+    @Override
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        final View view = layoutInflater.inflate(R.layout.row_mylist, null);
+        holder = new ViewHolder();
+        holder.name = (TextView) view.findViewById(R.id.title);
+        holder.radio = (RadioButton) view.findViewById(R.id.radioButton);
+        view.setTag(holder);
 
-        public TextView getTitleText() {
-            return titleText;
-        }
-
-        public void setTitleText(TextView titleText) {
-            this.titleText = titleText;
-        }
-
-        public CheckBox getCheckBox() {
-            return checkBox;
-        }
-
-        public void setCheckBox(CheckBox checkBox) {
-            this.checkBox = checkBox;
-        }
+        return view;
     }
 }

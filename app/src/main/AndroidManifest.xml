@@ -40,6 +40,11 @@
             android:authorities="com.jobs.matomesan.mycontentprovider"
             android:exported="false" >
         </provider>
+        <provider
+            android:name=".TestProvider"
+            android:authorities="com.jobs.matomesan.testprovider"
+            android:exported="false" >
+        </provider>
     </application>
 
 </manifest>

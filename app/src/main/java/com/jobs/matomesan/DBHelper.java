@@ -16,6 +16,13 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     @Override
+    public void onOpen(SQLiteDatabase db) {
+        if (!db.isReadOnly()) {
+            db.execSQL("PRAGMA foreign_keys = ON;");
+        }
+    }
+
+    @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(
                 "CREATE TABLE History (" +
@@ -38,7 +45,8 @@ public class DBHelper extends SQLiteOpenHelper {
                         "mylist_id INTEGER NOT NULL, " +
                         "site TEXT NOT NULL, " +
                         "url TEXT NOT NULL, " +
-                        "flag INTEGER NOT NULL)"
+                        "flag INTEGER NOT NULL, " +
+                        "FOREIGN KEY(mylist_id) REFERENCES MyList(_id) ON DELETE CASCADE)"
         );
     }
 

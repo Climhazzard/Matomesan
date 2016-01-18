@@ -10,8 +10,8 @@
         android:layout_height="match_parent"
         android:background="@drawable/row_mylist_background" >
 
-        <CheckBox
-            android:id="@+id/checkBox"
+        <RadioButton
+            android:id="@+id/radioButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
