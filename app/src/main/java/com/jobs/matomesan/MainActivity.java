@@ -13,6 +13,7 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -126,6 +127,9 @@ public class MainActivity extends AppCompatActivity {
             }
             @Override
             public boolean onQueryTextChange(String str) {
+                if (listView.getAdapter() == null) {
+                    return false;
+                }
                 android.widget.Filter filter = ((Filterable) listView.getAdapter()).getFilter();
                 if (TextUtils.isEmpty(str)) {
                     //listView.clearTextFilter();
