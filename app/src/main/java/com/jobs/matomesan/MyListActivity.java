@@ -163,6 +163,14 @@ public class MyListActivity extends AppCompatActivity implements LoaderManager.L
                                                     @Override
                                                     public void onClick(DialogInterface dialog, int which) {
                                                         int getId = editCursor.getInt(editCursor.getColumnIndex("_id"));
+                                                        if (getId == 1) {
+                                                            new AlertDialog.Builder(MyListActivity.this)
+                                                                    .setTitle("Error")
+                                                                    .setMessage(R.string.default_mylist_delete_ng)
+                                                                    .setPositiveButton("OK", null)
+                                                                    .show();
+                                                            return;
+                                                        }
                                                         int getFlag = editCursor.getInt(editCursor.getColumnIndex("flag"));
                                                         if (getFlag == 0) {
                                                             getContentResolver().delete(TestProvider.CONTENT_URI, "_id=?", new String[]{Integer.toString(getId)});
