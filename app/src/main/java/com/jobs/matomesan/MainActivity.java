@@ -14,13 +14,13 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Filterable;
 import android.widget.ListView;
+import com.jobs.matomesan.MeasurementGAManager;
 
 public class MainActivity extends AppCompatActivity {
     ListView listView;
@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
                 task.execute(XML_PARSER_URL);
             }
         });
+        MeasurementGAManager.sendGAScreen(this, getResources().getString(R.string.articleList));
     }
 
     @Override

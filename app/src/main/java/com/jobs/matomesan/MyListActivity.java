@@ -147,10 +147,18 @@ public class MyListActivity extends AppCompatActivity implements LoaderManager.L
                                                     @Override
                                                     public void onClick(DialogInterface dialog, int which) {
                                                         MyListDBAdapter DBAdapter = new MyListDBAdapter(MyListActivity.this);
-                                                        int getIdw = DBAdapter.getId2(poti);
+                                                        int getId = DBAdapter.getId2(poti);
+                                                        if (getId == 1) {
+                                                            new AlertDialog.Builder(MyListActivity.this)
+                                                                    .setTitle("Error")
+                                                                    .setMessage(R.string.default_mylist_rename_ng)
+                                                                    .setPositiveButton("OK", null)
+                                                                    .show();
+                                                            return;
+                                                        }
                                                         ContentValues values = new ContentValues();
                                                         values.put("name", editInput.getText().toString());
-                                                        getContentResolver().update(TestProvider.CONTENT_URI, values, "_id=?", new String[]{Integer.toString(getIdw)});
+                                                        getContentResolver().update(TestProvider.CONTENT_URI, values, "_id=?", new String[]{Integer.toString(getId)});
                                                     }
                                                 })
                                                 .setNegativeButton("Cancel", null)
