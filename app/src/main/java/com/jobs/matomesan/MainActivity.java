@@ -21,6 +21,8 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Filterable;
 import android.widget.ListView;
 import com.jobs.matomesan.MeasurementGAManager;
+import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends AppCompatActivity {
     ListView listView;
