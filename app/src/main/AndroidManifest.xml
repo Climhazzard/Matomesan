@@ -3,17 +3,17 @@
     package="com.jobs.matomesan" >
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL" />
 
     <application
+        android:name=".MeasurementGAManager"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:name="com.jobs.matomesan.MeasurementGAManager" >
-
-        <meta-data android:name="com.google.android.gms.version"
+        android:theme="@style/AppTheme" >
+        <meta-data
+            android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
         <activity
@@ -42,6 +42,7 @@
             android:name=".MyListContentsActivity"
             android:label="@string/title_activity_my_list_contents" >
         </activity>
+
         <provider
             android:name=".MyListContentProvider"
             android:authorities="com.jobs.matomesan.mycontentprovider"
@@ -53,13 +54,23 @@
             android:exported="false" >
         </provider>
 
-        <activity android:name="com.google.android.gms.ads.AdActivity"
-                  android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
-                  android:theme="@android:style/Theme.Translucent" />
+        <activity
+            android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:theme="@android:style/Theme.Translucent" />
 
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="9dfd77a206500f906307fb8c30cbbbf098124018" />
+
+        <activity
+            android:name=".ReadItLaterActivity"
+            android:label="@string/title_activity_read_it_later" >
+        </activity>
+        <activity
+            android:name=".BookMarkActivity"
+            android:label="@string/title_activity_book_mark" >
+        </activity>
     </application>
 
 </manifest>

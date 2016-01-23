@@ -87,6 +87,16 @@ public class MyListActivity extends AppCompatActivity implements LoaderManager.L
                         historyIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(historyIntent);
                         break;
+                    case R.id.readitlater:
+                        Intent readItLaterIntent = new Intent(MyListActivity.this, ReadItLaterActivity.class);
+                        readItLaterIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(readItLaterIntent);
+                        break;
+                    case R.id.bookmark:
+                        Intent bookMarkIntent = new Intent(MyListActivity.this, BookMarkActivity.class);
+                        bookMarkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(bookMarkIntent);
+                        break;
                     default:
                         break;
                 }

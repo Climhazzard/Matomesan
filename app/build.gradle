@@ -39,6 +39,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'com.android.support:design:22.2.0'
     compile 'com.google.android.gms:play-services:7.0.0'
+    compile 'de.timroes.android:EnhancedListView:0.3.4'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }

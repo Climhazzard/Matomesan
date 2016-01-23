@@ -3,43 +3,40 @@ package com.jobs.matomesan;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
-
-import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import de.timroes.android.listview.EnhancedListView;
 
-public class HistoryActivity extends AppCompatActivity {
+
+public class ReadItLaterActivity extends AppCompatActivity {
     private Toolbar toolbar;
-    List<ListItem> list = new ArrayList<>();
-    private ListView listView;
     private DrawerLayout drawerLayout;
-    CustomAdapter adapter;
-    ListItem item;
-    private String tmpURL;
+    List<ListItem> list = new ArrayList<>();
+    private EnhancedListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_history);
+        setContentView(R.layout.activity_read_it_later);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(R.string.history);
+        getSupportActionBar().setTitle(R.string.readItLater);
 
-        listView = (ListView) findViewById(android.R.id.list);
+        listView = (EnhancedListView) findViewById(android.R.id.list);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name){
@@ -63,25 +60,25 @@ public class HistoryActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.articlelist:
-                        Intent articleIntent = new Intent(HistoryActivity.this, MainActivity.class);
+                        Intent articleIntent = new Intent(ReadItLaterActivity.this, MainActivity.class);
                         articleIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(articleIntent);
                         break;
                     case R.id.mylist:
-                        Intent mylistIntent = new Intent(HistoryActivity.this, MyListActivity.class);
+                        Intent mylistIntent = new Intent(ReadItLaterActivity.this, MyListActivity.class);
                         mylistIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(mylistIntent);
                         break;
-                    case R.id.history:
+                    case R.id.readitlater:
                         drawerLayout.closeDrawers();
                         break;
-                    case R.id.readitlater:
-                        Intent readItLaterIntent = new Intent(HistoryActivity.this, ReadItLaterActivity.class);
-                        readItLaterIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(readItLaterIntent);
+                    case R.id.history:
+                        Intent historyIntent = new Intent(ReadItLaterActivity.this, HistoryActivity.class);
+                        historyIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(historyIntent);
                         break;
                     case R.id.bookmark:
-                        Intent bookMarkIntent = new Intent(HistoryActivity.this, BookMarkActivity.class);
+                        Intent bookMarkIntent = new Intent(ReadItLaterActivity.this, BookMarkActivity.class);
                         bookMarkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(bookMarkIntent);
                         break;
@@ -92,50 +89,70 @@ public class HistoryActivity extends AppCompatActivity {
             }
         });
 
-        HistoryDBAdapter DBAdapter = new HistoryDBAdapter(this);
+        ReadItLaterDBAdapter DBAdapter = new ReadItLaterDBAdapter(this);
         Cursor c = DBAdapter.getAllList();
         while (c.moveToNext()) {
-            list.add(new ListItem(c.getString(c.getColumnIndex("site")),
+            list.add(new ListItem(c.getInt(c.getColumnIndex("_id")),
+                    c.getString(c.getColumnIndex("site")),
                     c.getString(c.getColumnIndex("title")),
                     c.getString(c.getColumnIndex("url")),
                     c.getString(c.getColumnIndex("date"))));
         }
-        listView.setAdapter(new CustomAdapter(HistoryActivity.this, list));
+        listView.setAdapter(new CustomAdapter(ReadItLaterActivity.this, list));
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView parent, View view, int position, long id) {
-                ListItem item = (ListItem) parent.getAdapter().getItem(position);
-                Intent intent = new Intent(HistoryActivity.this, WebViewActivity.class);
+                CustomAdapter customAdapter = (CustomAdapter) parent.getAdapter();
+                ListItem item = (ListItem) customAdapter.getItem(position);
+                ReadItLaterDBAdapter DBAdapter = new ReadItLaterDBAdapter(ReadItLaterActivity.this);
+                DBAdapter.deleteRecode(item.getId());
+
+                HistoryDBAdapter historyDBAdapter = new HistoryDBAdapter(ReadItLaterActivity.this);
+                historyDBAdapter.insert(item);
+
+                Intent intent = new Intent(ReadItLaterActivity.this, WebViewActivity.class);
                 intent.putExtra("getLink", item.getLink());
                 startActivity(intent);
             }
         });
 
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        listView.setDismissCallback(new de.timroes.android.listview.EnhancedListView.OnDismissCallback() {
             @Override
-            public boolean onItemLongClick(AdapterView parent, View view, int position, long id) {
-                adapter = (CustomAdapter) parent.getAdapter();
-                item = (ListItem)adapter.getItem(position);
-                tmpURL = item.getLink();
-                new AlertDialog.Builder(HistoryActivity.this)
-                        .setMessage(R.string.delete)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                adapter.remove(item);
-                                adapter.notifyDataSetChanged();
-                                HistoryDBAdapter DBAdapter = new HistoryDBAdapter(HistoryActivity.this);
-                                DBAdapter.deleteRecode(tmpURL);
-                            }
-                        })
-                        .setNegativeButton("Cancel", null)
-                        .show();
+            public EnhancedListView.Undoable onDismiss(EnhancedListView listView, final int position) {
+                CustomAdapter customAdapter = (CustomAdapter) listView.getAdapter();
+                ListItem item = (ListItem) customAdapter.getItem(position);
+                customAdapter.remove(item);
 
-                return true;
+                ReadItLaterDBAdapter DBAdapter = new ReadItLaterDBAdapter(ReadItLaterActivity.this);
+                DBAdapter.deleteRecode(item.getId());
+
+                customAdapter.notifyDataSetChanged();
+                Toast.makeText(ReadItLaterActivity.this, R.string.readItLater_delete, Toast.LENGTH_SHORT).show();
+                return null;
             }
         });
+        listView.enableSwipeToDismiss();
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ReadItLaterDBAdapter DBAdapter = new ReadItLaterDBAdapter(ReadItLaterActivity.this);
+        List<ListItem> list = new ArrayList<>();
+        Cursor c = DBAdapter.getAllList();
+        while (c.moveToNext()) {
+            list.add(new ListItem(c.getInt(c.getColumnIndex("_id")),
+                    c.getString(c.getColumnIndex("site")),
+                    c.getString(c.getColumnIndex("title")),
+                    c.getString(c.getColumnIndex("url")),
+                    c.getString(c.getColumnIndex("date"))));
+        }
+        listView.setAdapter(new CustomAdapter(ReadItLaterActivity.this, list));
+        ((CustomAdapter)listView.getAdapter()).notifyDataSetChanged();
+    }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -153,14 +170,14 @@ public class HistoryActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.menu_trash) {
-            new AlertDialog.Builder(HistoryActivity.this)
+            new AlertDialog.Builder(ReadItLaterActivity.this)
                     .setMessage(R.string.trash)
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            listView.setAdapter(new CustomAdapter(HistoryActivity.this, new ArrayList<ListItem>()));
+                            listView.setAdapter(new CustomAdapter(ReadItLaterActivity.this, new ArrayList<ListItem>()));
                             ((CustomAdapter)listView.getAdapter()).notifyDataSetChanged();
-                            HistoryDBAdapter DBAdapter = new HistoryDBAdapter(HistoryActivity.this);
+                            ReadItLaterDBAdapter DBAdapter = new ReadItLaterDBAdapter(ReadItLaterActivity.this);
                             DBAdapter.deleteAllRecode();
                         }
                     })

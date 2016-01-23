@@ -2,8 +2,14 @@
     <string name="app_name">まとめさん</string>
     <string name="articleList">新着記事</string>
     <string name="myList">マイリスト</string>
+    <string name="readItLater">あとで読む</string>
+    <string name="bookMark">お気に入り記事</string>
+    <string name="readItLater_delete">削除しました</string>
     <string name="history">閲覧履歴</string>
+    <string name="read_later">あとで読むに追加しました</string>
     <string name="delete">この記事を削除しますか？</string>
+    <string name="add_bookmark">この記事をお気に入りに追加しますか？</string>
+    <string name="complete_add_bookmark">お気に入りに追加しました</string>
     <string name="delete_url">このサイトを削除しますか？</string>
     <string name="delete_mylist">このマイリストを削除しますか？</string>
     <string name="trash">全件削除しますか？</string>
@@ -29,4 +35,6 @@
     <string name="title_activity_history">HistoryActivity</string>
     <string name="title_activity_my_list">MyListActivity</string>
     <string name="title_activity_my_list_contents">MyListContentsActivity</string>
+    <string name="title_activity_read_it_later">ReadItLaterActivity</string>
+    <string name="title_activity_book_mark">BookMarkActivity</string>
 </resources>

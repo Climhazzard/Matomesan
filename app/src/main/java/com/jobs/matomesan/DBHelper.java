@@ -10,6 +10,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String TABLE_HISTORY = "History";
     public static final String TABLE_MYLIST = "MyList";
     public static final String TABLE_MYLISTCONTENTS = "MyListContents";
+    public static final String TABLE_READITLATER = "ReadItLater";
+    public static final String TABLE_BOOKMARK = "BookMark";
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -31,7 +33,6 @@ public class DBHelper extends SQLiteOpenHelper {
                         "url TEXT NOT NULL, " +
                         "site TEXT NOT NULL, " +
                         "date TEXT NOT NULL)"
-
         );
         db.execSQL(
                 "CREATE TABLE MyList (" +
@@ -48,6 +49,22 @@ public class DBHelper extends SQLiteOpenHelper {
                         "flag INTEGER NOT NULL, " +
                         "FOREIGN KEY(mylist_id) REFERENCES MyList(_id) ON DELETE CASCADE)"
         );
+        db.execSQL(
+                "CREATE TABLE ReadItLater (" +
+                        "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "title TEXT NOT NULL, " +
+                        "url TEXT NOT NULL, " +
+                        "site TEXT NOT NULL, " +
+                        "date TEXT NOT NULL)"
+        );
+        db.execSQL(
+                "CREATE TABLE BookMark (" +
+                        "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "title TEXT NOT NULL, " +
+                        "url TEXT NOT NULL, " +
+                        "site TEXT NOT NULL, " +
+                        "date TEXT NOT NULL)"
+        );
     }
 
     @Override
@@ -55,6 +72,8 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + HistoryDBAdapter.DATABASE_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + MyListDBAdapter.DATABASE_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + MyListContentsDBAdapter.DATABASE_TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + ReadItLaterDBAdapter.DATABASE_TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + BookMarkDBAdapter.DATABASE_TABLE);
         onCreate(db);
     }
 }

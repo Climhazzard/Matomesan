@@ -10,6 +10,14 @@
             android:icon="@mipmap/ic_menu_articlelist"
             android:title="@string/articleList"/>
         <item
+            android:id="@+id/readitlater"
+            android:icon="@mipmap/ic_menu_check"
+            android:title="@string/readItLater"/>
+        <item
+            android:id="@+id/bookmark"
+            android:icon="@mipmap/ic_menu_star"
+            android:title="@string/bookMark"/>
+        <item
             android:id="@+id/mylist"
             android:icon="@mipmap/ic_menu_mylist"
             android:title="@string/myList"/>
