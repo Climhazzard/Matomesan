@@ -7,50 +7,45 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.Filterable;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import com.jobs.matomesan.MeasurementGAManager;
-import com.crashlytics.android.Crashlytics;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import de.timroes.android.listview.EnhancedListView;
-import io.fabric.sdk.android.Fabric;
 
-public class MainActivity extends AppCompatActivity {
-    EnhancedListView listView;
-    public static final String XML_PARSER_URL = "http://testmode.s348.xrea.com/xmlparser.php";
-    public static final String POPULAR_URL = "http://matome.s500.xrea.com/result.php";
+
+public class PopularActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
+    List<ListItem> list = new ArrayList<>();
+    private EnhancedListView listView;
     private SwipeRefreshLayout mSwipe;
-    private SearchView mSearchView;
     private ListItem bookMarkItem;
+    private SearchView mSearchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
+        setContentView(R.layout.activity_popular);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(R.string.articleList);
+        getSupportActionBar().setTitle(R.string.popularList);
         listView = (EnhancedListView) findViewById(android.R.id.list);
         mSwipe = (SwipeRefreshLayout) findViewById(R.id.swipelayout);
         mSwipe.setColorSchemeResources(R.color.base_color, R.color.blue, R.color.red, R.color.green);
@@ -60,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mSwipe.setRefreshing(true);
-                AsyncThread task = new AsyncThread(listView, MainActivity.this, mSwipe);
-                task.execute(XML_PARSER_URL);
+                AsyncThread task = new AsyncThread(listView, PopularActivity.this, mSwipe);
+                task.popularGet();
             }
         });
 
@@ -86,32 +81,32 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.articlelist:
-                        drawerLayout.closeDrawers();
+                        Intent articleIntent = new Intent(PopularActivity.this, MainActivity.class);
+                        articleIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(articleIntent);
                         break;
                     case R.id.mylist:
-                        Intent mylistIntent = new Intent(MainActivity.this, MyListActivity.class);
+                        Intent mylistIntent = new Intent(PopularActivity.this, MyListActivity.class);
                         mylistIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(mylistIntent);
                         break;
+                    case R.id.popularlist:
+                        drawerLayout.closeDrawers();
+                        break;
                     case R.id.history:
-                        Intent historyIntent = new Intent(MainActivity.this, HistoryActivity.class);
+                        Intent historyIntent = new Intent(PopularActivity.this, HistoryActivity.class);
                         historyIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(historyIntent);
                         break;
-                    case R.id.readitlater:
-                        Intent readItLaterIntent = new Intent(MainActivity.this, ReadItLaterActivity.class);
-                        readItLaterIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(readItLaterIntent);
-                        break;
                     case R.id.bookmark:
-                        Intent bookMarkIntent = new Intent(MainActivity.this, BookMarkActivity.class);
+                        Intent bookMarkIntent = new Intent(PopularActivity.this, BookMarkActivity.class);
                         bookMarkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(bookMarkIntent);
                         break;
-                    case R.id.popularlist:
-                        Intent popularIntent = new Intent(MainActivity.this, PopularActivity.class);
-                        popularIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(popularIntent);
+                    case R.id.readitlater:
+                        Intent readItLaterIntent = new Intent(PopularActivity.this, ReadItLaterActivity.class);
+                        readItLaterIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(readItLaterIntent);
                         break;
                     default:
                         break;
@@ -127,49 +122,47 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        AsyncThread task = new AsyncThread(listView, MainActivity.this, mSwipe);
-        task.execute(XML_PARSER_URL);
+        AsyncThread task = new AsyncThread(listView, PopularActivity.this, mSwipe);
+        task.popularGet();
 
         mSwipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                AsyncThread task = new AsyncThread(listView, MainActivity.this, mSwipe);
-                task.execute(XML_PARSER_URL);
+                AsyncThread task = new AsyncThread(listView, PopularActivity.this, mSwipe);
+                task.popularGet();
             }
         });
 
         listView.setDismissCallback(new de.timroes.android.listview.EnhancedListView.OnDismissCallback() {
             @Override
             public EnhancedListView.Undoable onDismiss(EnhancedListView listView, final int position) {
-                CustomAdapter customAdapter = (CustomAdapter) listView.getAdapter();
-                ListItem item = (ListItem) customAdapter.getItem(position);
-                customAdapter.remove(item);
-                customAdapter.notifyDataSetChanged();
+                CustomPopularAdapter customPopularAdapter = (CustomPopularAdapter) listView.getAdapter();
+                ListItem item = (ListItem) customPopularAdapter.getItem(position);
+                customPopularAdapter.remove(item);
+                customPopularAdapter.notifyDataSetChanged();
 
-                ReadItLaterDBAdapter DBAdapter = new ReadItLaterDBAdapter(MainActivity.this);
+                ReadItLaterDBAdapter DBAdapter = new ReadItLaterDBAdapter(PopularActivity.this);
                 DBAdapter.insert(item);
 
-                Toast.makeText(MainActivity.this, R.string.read_later, Toast.LENGTH_SHORT).show();
+                Toast.makeText(PopularActivity.this, R.string.read_later, Toast.LENGTH_SHORT).show();
                 return null;
             }
         });
         listView.enableSwipeToDismiss();
 
-        MeasurementGAManager.sendGAScreen(this, getResources().getString(R.string.articleList));
-
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView parent, View view, int position, long id) {
-                CustomAdapter adapter = (CustomAdapter) parent.getAdapter();
+                CustomPopularAdapter adapter = (CustomPopularAdapter) parent.getAdapter();
                 bookMarkItem = (ListItem) adapter.getItem(position);
-                new AlertDialog.Builder(MainActivity.this)
+                new AlertDialog.Builder(PopularActivity.this)
                         .setMessage(R.string.add_bookmark)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                BookMarkDBAdapter DBAdapter = new BookMarkDBAdapter(MainActivity.this);
+                                BookMarkDBAdapter DBAdapter = new BookMarkDBAdapter(PopularActivity.this);
                                 DBAdapter.insert(bookMarkItem);
-                                Toast.makeText(MainActivity.this, R.string.complete_add_bookmark, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(PopularActivity.this, R.string.complete_add_bookmark, Toast.LENGTH_SHORT).show();
                             }
                         })
                         .setNegativeButton("Cancel", null)
@@ -179,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -194,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onQueryTextSubmit(String str) {
                 return false;
             }
+
             @Override
             public boolean onQueryTextChange(String str) {
                 if (listView.getAdapter() == null) {

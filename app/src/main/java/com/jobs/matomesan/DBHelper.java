@@ -1,20 +1,23 @@
 package com.jobs.matomesan;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBHelper extends SQLiteOpenHelper {
     public static final String DB_NAME = "datastore.db";
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 2;
     public static final String TABLE_HISTORY = "History";
     public static final String TABLE_MYLIST = "MyList";
     public static final String TABLE_MYLISTCONTENTS = "MyListContents";
     public static final String TABLE_READITLATER = "ReadItLater";
     public static final String TABLE_BOOKMARK = "BookMark";
+    private Context context;
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
+        this.context = context;
     }
 
     @Override
@@ -69,11 +72,25 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + HistoryDBAdapter.DATABASE_TABLE);
-        db.execSQL("DROP TABLE IF EXISTS " + MyListDBAdapter.DATABASE_TABLE);
-        db.execSQL("DROP TABLE IF EXISTS " + MyListContentsDBAdapter.DATABASE_TABLE);
-        db.execSQL("DROP TABLE IF EXISTS " + ReadItLaterDBAdapter.DATABASE_TABLE);
-        db.execSQL("DROP TABLE IF EXISTS " + BookMarkDBAdapter.DATABASE_TABLE);
-        onCreate(db);
+        if (oldVersion == 1 && newVersion == 2) {
+            db.execSQL("DROP TABLE IF EXISTS " + ReadItLaterDBAdapter.DATABASE_TABLE);
+            db.execSQL("DROP TABLE IF EXISTS " + BookMarkDBAdapter.DATABASE_TABLE);
+            db.execSQL(
+                    "CREATE TABLE ReadItLater (" +
+                            "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                            "title TEXT NOT NULL, " +
+                            "url TEXT NOT NULL, " +
+                            "site TEXT NOT NULL, " +
+                            "date TEXT NOT NULL)"
+            );
+            db.execSQL(
+                    "CREATE TABLE BookMark (" +
+                            "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                            "title TEXT NOT NULL, " +
+                            "url TEXT NOT NULL, " +
+                            "site TEXT NOT NULL, " +
+                            "date TEXT NOT NULL)"
+            );
+        }
     }
 }

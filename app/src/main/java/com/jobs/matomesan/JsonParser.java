@@ -55,4 +55,18 @@ public class JsonParser {
         }
         return item;
     }
+
+    public List<ListItem> popularParser(String JsonData) {
+        try {
+            JSONObject rootObject = new JSONObject(JsonData);
+            JSONArray jsonArray = rootObject.getJSONArray("popular");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject js = jsonArray.getJSONObject(i);
+                list.add(new ListItem(js.getInt("id"), js.getString("site"), js.getString("title"), js.getString("date"), js.getString("link"), js.getInt("cnt")));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }

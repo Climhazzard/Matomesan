@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -82,6 +83,11 @@ public class ReadItLaterActivity extends AppCompatActivity {
                         bookMarkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(bookMarkIntent);
                         break;
+                    case R.id.popularlist:
+                        Intent popularIntent = new Intent(ReadItLaterActivity.this, PopularActivity.class);
+                        popularIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(popularIntent);
+                        break;
                     default:
                         break;
                 }
@@ -121,6 +127,9 @@ public class ReadItLaterActivity extends AppCompatActivity {
             @Override
             public EnhancedListView.Undoable onDismiss(EnhancedListView listView, final int position) {
                 CustomAdapter customAdapter = (CustomAdapter) listView.getAdapter();
+                if (customAdapter.getCount() <= position) {
+                    return null;
+                }
                 ListItem item = (ListItem) customAdapter.getItem(position);
                 customAdapter.remove(item);
 
@@ -136,7 +145,7 @@ public class ReadItLaterActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
+    protected void onStop() {
         super.onPause();
         ReadItLaterDBAdapter DBAdapter = new ReadItLaterDBAdapter(ReadItLaterActivity.this);
         List<ListItem> list = new ArrayList<>();
@@ -151,8 +160,6 @@ public class ReadItLaterActivity extends AppCompatActivity {
         listView.setAdapter(new CustomAdapter(ReadItLaterActivity.this, list));
         ((CustomAdapter)listView.getAdapter()).notifyDataSetChanged();
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

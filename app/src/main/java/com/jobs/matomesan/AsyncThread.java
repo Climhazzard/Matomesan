@@ -179,4 +179,49 @@ public class AsyncThread extends AsyncTask<String, String, String> {
 
         }.execute(param);
     }
+
+    public void popularGet() {
+        new AsyncTask<Param, Void, String>() {
+            @Override
+            protected String doInBackground(Param... params) {
+                String json = null;
+                try {
+                    HttpClient httpClient = new DefaultHttpClient();
+                    HttpPost post = new HttpPost(MainActivity.POPULAR_URL);
+                    ArrayList value = new ArrayList<NameValuePair>();
+                    value.add(new BasicNameValuePair("popular", "a"));
+                    post.setEntity(new UrlEncodedFormEntity(value, "UTF-8"));
+                    HttpResponse res = httpClient.execute(post);
+                    HttpEntity entity = res.getEntity();
+                    json = EntityUtils.toString(entity, "UTF-8");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return json;
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+                if (mSwipe.isRefreshing()) {
+                    mSwipe.setRefreshing(false);
+                }
+                if (result == null) return;
+                JsonParser jp = new JsonParser();
+                List<ListItem> item = jp.popularParser(result);
+                listView.setAdapter(new CustomPopularAdapter(context, item));
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView parent, View view, int position, long id) {
+                        ListItem item = (ListItem)parent.getAdapter().getItem(position);
+                        HistoryDBAdapter DBAdapter = new HistoryDBAdapter(context);
+                        DBAdapter.insert(item);
+                        Intent intent = new Intent(context, WebViewActivity.class);
+                        intent.putExtra("getLink", item.getLink());
+                        context.startActivity(intent);
+                    }
+                });
+            }
+
+        }.execute();
+    }
 }

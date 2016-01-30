@@ -71,6 +71,10 @@
             android:name=".BookMarkActivity"
             android:label="@string/title_activity_book_mark" >
         </activity>
+        <activity
+            android:name=".PopularActivity"
+            android:label="@string/title_activity_popular" >
+        </activity>
     </application>
 
 </manifest>

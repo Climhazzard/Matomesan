@@ -3,7 +3,6 @@ package com.jobs.matomesan;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.TextUtils;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,14 +14,14 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomAdapter extends BaseAdapter implements Filterable {
+public class CustomPopularAdapter extends BaseAdapter implements Filterable {
     private Context context;
     private List<ListItem> listItem;
     private List<ListItem> mBackData = new ArrayList<ListItem>();
     private LayoutInflater layoutInflater = null;
     private customFilter mFilter;
 
-    public CustomAdapter(Context context, List<ListItem> list) {
+    public CustomPopularAdapter(Context context, List<ListItem> list) {
         super();
         this.context = context;
         this.listItem = list;
@@ -53,10 +52,11 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         ListItem item = (ListItem) getItem(position);
-        convertView = layoutInflater.inflate(R.layout.list_item, null);
+        convertView = layoutInflater.inflate(R.layout.popular_list_item, null);
         TextView tv = (TextView) convertView.findViewById(R.id.list_item);
         TextView tv2 = (TextView) convertView.findViewById(R.id.list_title);
         TextView tv3 = (TextView) convertView.findViewById(R.id.list_date);
+        TextView tv4 = (TextView) convertView.findViewById(R.id.list_cnt);
         if(position % 2 == 0) {
             convertView.setBackgroundColor(Color.rgb(214, 214, 214));
         } else {
@@ -65,6 +65,8 @@ public class CustomAdapter extends BaseAdapter implements Filterable {
         tv.setText(item.getTitle());
         tv2.setText(item.getSiteName());
         tv3.setText(item.getDate());
+        tv4.setText(String.valueOf(item.getCnt()) + "users");
+        tv4.setBackgroundColor(Color.RED);
 
         return convertView;
     }

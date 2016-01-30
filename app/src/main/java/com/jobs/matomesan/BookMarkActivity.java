@@ -85,6 +85,11 @@ public class BookMarkActivity extends AppCompatActivity {
                     case R.id.bookmark:
                         drawerLayout.closeDrawers();
                         break;
+                    case R.id.popularlist:
+                        Intent popularIntent = new Intent(BookMarkActivity.this, PopularActivity.class);
+                        popularIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(popularIntent);
+                        break;
                     default:
                         break;
                 }
@@ -102,6 +107,21 @@ public class BookMarkActivity extends AppCompatActivity {
                     c.getString(c.getColumnIndex("date"))));
         }
         listView.setAdapter(new CustomAdapter(BookMarkActivity.this, list));
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView parent, View view, int position, long id) {
+                CustomAdapter customAdapter = (CustomAdapter) parent.getAdapter();
+                ListItem item = (ListItem) customAdapter.getItem(position);
+
+                HistoryDBAdapter historyDBAdapter = new HistoryDBAdapter(BookMarkActivity.this);
+                historyDBAdapter.insert(item);
+
+                Intent intent = new Intent(BookMarkActivity.this, WebViewActivity.class);
+                intent.putExtra("getLink", item.getLink());
+                startActivity(intent);
+            }
+        });
 
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override

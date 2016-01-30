@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">まとめさん</string>
     <string name="articleList">新着記事</string>
+    <string name="popularList">注目のまとめ記事</string>
     <string name="myList">マイリスト</string>
     <string name="readItLater">あとで読む</string>
     <string name="bookMark">お気に入り記事</string>
@@ -37,4 +38,5 @@
     <string name="title_activity_my_list_contents">MyListContentsActivity</string>
     <string name="title_activity_read_it_later">ReadItLaterActivity</string>
     <string name="title_activity_book_mark">BookMarkActivity</string>
+    <string name="title_activity_popular">PopularActivity</string>
 </resources>

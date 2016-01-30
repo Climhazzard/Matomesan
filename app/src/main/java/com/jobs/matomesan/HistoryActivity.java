@@ -17,19 +17,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.timroes.android.listview.EnhancedListView;
 
 
 public class HistoryActivity extends AppCompatActivity {
     private Toolbar toolbar;
     List<ListItem> list = new ArrayList<>();
-    private ListView listView;
+    private EnhancedListView listView;
     private DrawerLayout drawerLayout;
     CustomAdapter adapter;
     ListItem item;
-    private String tmpURL;
+    private ListItem bookMarkItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +42,7 @@ public class HistoryActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.history);
 
-        listView = (ListView) findViewById(android.R.id.list);
+        listView = (EnhancedListView) findViewById(android.R.id.list);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name){
@@ -85,6 +88,11 @@ public class HistoryActivity extends AppCompatActivity {
                         bookMarkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(bookMarkIntent);
                         break;
+                    case R.id.popularlist:
+                        Intent popularIntent = new Intent(HistoryActivity.this, PopularActivity.class);
+                        popularIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(popularIntent);
+                        break;
                     default:
                         break;
                 }
@@ -95,7 +103,8 @@ public class HistoryActivity extends AppCompatActivity {
         HistoryDBAdapter DBAdapter = new HistoryDBAdapter(this);
         Cursor c = DBAdapter.getAllList();
         while (c.moveToNext()) {
-            list.add(new ListItem(c.getString(c.getColumnIndex("site")),
+            list.add(new ListItem(c.getInt(c.getColumnIndex("_id")),
+                    c.getString(c.getColumnIndex("site")),
                     c.getString(c.getColumnIndex("title")),
                     c.getString(c.getColumnIndex("url")),
                     c.getString(c.getColumnIndex("date"))));
@@ -115,18 +124,16 @@ public class HistoryActivity extends AppCompatActivity {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView parent, View view, int position, long id) {
-                adapter = (CustomAdapter) parent.getAdapter();
-                item = (ListItem)adapter.getItem(position);
-                tmpURL = item.getLink();
+                CustomAdapter adapter = (CustomAdapter) parent.getAdapter();
+                bookMarkItem = (ListItem) adapter.getItem(position);
                 new AlertDialog.Builder(HistoryActivity.this)
-                        .setMessage(R.string.delete)
+                        .setMessage(R.string.add_bookmark)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                adapter.remove(item);
-                                adapter.notifyDataSetChanged();
-                                HistoryDBAdapter DBAdapter = new HistoryDBAdapter(HistoryActivity.this);
-                                DBAdapter.deleteRecode(tmpURL);
+                                BookMarkDBAdapter DBAdapter = new BookMarkDBAdapter(HistoryActivity.this);
+                                DBAdapter.insert(bookMarkItem);
+                                Toast.makeText(HistoryActivity.this, R.string.complete_add_bookmark, Toast.LENGTH_SHORT).show();
                             }
                         })
                         .setNegativeButton("Cancel", null)
@@ -135,6 +142,26 @@ public class HistoryActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+        listView.setDismissCallback(new de.timroes.android.listview.EnhancedListView.OnDismissCallback() {
+            @Override
+            public EnhancedListView.Undoable onDismiss(EnhancedListView listView, final int position) {
+                CustomAdapter customAdapter = (CustomAdapter) listView.getAdapter();
+                if (customAdapter.getCount() <= position) {
+                    return null;
+                }
+                ListItem item = (ListItem) customAdapter.getItem(position);
+                customAdapter.remove(item);
+
+                HistoryDBAdapter DBAdapter = new HistoryDBAdapter(HistoryActivity.this);
+                DBAdapter.deleteRecode(item.getId());
+
+                customAdapter.notifyDataSetChanged();
+                Toast.makeText(HistoryActivity.this, R.string.readItLater_delete, Toast.LENGTH_SHORT).show();
+                return null;
+            }
+        });
+        listView.enableSwipeToDismiss();
     }
 
     @Override

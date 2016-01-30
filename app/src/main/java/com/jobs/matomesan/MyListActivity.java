@@ -97,6 +97,11 @@ public class MyListActivity extends AppCompatActivity implements LoaderManager.L
                         bookMarkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(bookMarkIntent);
                         break;
+                    case R.id.popularlist:
+                        Intent popularIntent = new Intent(MyListActivity.this, PopularActivity.class);
+                        popularIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(popularIntent);
+                        break;
                     default:
                         break;
                 }

@@ -20,8 +20,8 @@ public class HistoryDBAdapter {
         return db.query(DBHelper.TABLE_HISTORY, null, null, null, null, null, orderStr);
     }
 
-    public void deleteRecode(String key) {
-        db.delete(DBHelper.TABLE_HISTORY, "url=?", new String[]{key});
+    public void deleteRecode(int id) {
+        db.delete(DBHelper.TABLE_HISTORY, "_id=?", new String[]{Integer.toString(id)});
     }
 
     public void deleteAllRecode() {

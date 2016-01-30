@@ -18,7 +18,7 @@
             app:titleTextAppearance="@style/MyActionBarTitleText"
             android:background="?attr/colorPrimary" />
 
-        <ListView
+        <de.timroes.android.listview.EnhancedListView
             android:id="@id/android:list"
             android:drawSelectorOnTop="true"
             android:layout_width="match_parent"

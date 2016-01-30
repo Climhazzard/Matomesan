@@ -6,6 +6,7 @@ public class ListItem {
     private String postSiteTitle;
     private String postDate;
     private int postId;
+    private int postCnt;
 
     public ListItem(String siteTitle, String link) {
         this.postSiteTitle = siteTitle;
@@ -27,6 +28,15 @@ public class ListItem {
         this.postSiteTitle = siteTitle;
     }
 
+    public ListItem(int _id, String siteTitle, String title, String date, String link, int cnt) {
+        this.postId = _id;
+        this.postTitle = title;
+        this.postLink = link;
+        this.postDate = date;
+        this.postSiteTitle = siteTitle;
+        this.postCnt = cnt;
+    }
+
     public String getTitle() {
         return postTitle;
     }
@@ -45,5 +55,9 @@ public class ListItem {
 
     public int getId() {
         return postId;
+    }
+
+    public int getCnt() {
+        return postCnt;
     }
 }
